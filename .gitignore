@@ -1,0 +1,36 @@
+# --------------------
+# Docs (reference only)
+# --------------------
+docs/
+
+# --------------------
+# Python
+# --------------------
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.env
+venv/
+.venv/
+
+# --------------------
+# Node / Frontend tooling (future proof)
+# --------------------
+node_modules/
+dist/
+build/
+
+# --------------------
+# OS / Editor junk
+# --------------------
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# --------------------
+# Logs
+# --------------------
+*.log
+logs/

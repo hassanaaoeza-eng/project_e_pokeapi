@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Refined Battle Arena Screen</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/retro.css">
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link href="https://fonts.googleapis.com/css2?family=VT323&amp;display=swap" rel="stylesheet" />
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#D97706",
+                        "background-light": "#F0FDF4",
+                        "background-dark": "#111827",
+                        "hud-bg": "#2F3A4F",
+                        "hud-border": "#EFA747",
+                        "stat-bg": "#F8F8D8",
+                    },
+                    fontFamily: {
+                        display: ['"VT323"', "monospace"],
+                    },
+                },
+            },
+        };
+    </script>
+    <style>
+        .pixelated {
+            image-rendering: pixelated;
+        }
+
+        .retro-scrollbar::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .retro-scrollbar::-webkit-scrollbar-track {
+            background: #1f2937;
+        }
+
+        .retro-scrollbar::-webkit-scrollbar-thumb {
+            background: #EFA747;
+            border: 2px solid #1f2937;
+        }
+    </style>
+</head>
+
+<body
+    class="bg-gray-900 min-h-screen flex items-center justify-center font-display text-xl transition-colors duration-300">
+    <div
+        class="relative w-full max-w-5xl aspect-video bg-gradient-to-b from-[#70C080] to-[#4A9060] border-4 border-gray-300 shadow-2xl overflow-hidden rounded-none">
+
+        <!-- Enemy Info -->
+        <div class="absolute top-[12%] right-[10%] z-10 flex flex-col items-center" data-role="enemy-container">
+            <div class="relative z-20 animate-bounce" style="animation-duration: 3s;">
+                <img alt="Enemy Sprite" data-role="enemy-sprite" class="w-48 h-48 pixelated object-contain" src="" />
+            </div>
+            <div
+                class="absolute bottom-4 w-48 h-16 bg-[#A8E090] border-4 border-[#88C070] rounded-[50%] z-10 opacity-90">
+            </div>
+            <div class="absolute bottom-2 w-48 h-16 bg-black/20 rounded-[50%] z-0 blur-md"></div>
+        </div>
+
+        <div
+            class="absolute top-[12%] right-[32%] z-[100] w-64 bg-stat-bg border-4 border-gray-700 rounded-none shadow-lg p-3">
+            <div class="flex justify-between items-baseline mb-1">
+                <span class="text-2xl font-bold text-gray-900 uppercase tracking-widest leading-none"
+                    data-role="enemy-name">Enemy</span>
+            </div>
+            <div class="flex items-center gap-2 mb-1">
+                <span
+                    class="text-primary font-bold text-base bg-yellow-900 px-1 rounded-none text-yellow-100 border border-yellow-700">HP</span>
+                <div class="flex-grow h-3 bg-gray-900 border border-white relative">
+                    <div class="absolute top-0 left-0 h-full bg-green-500 w-[100%]" data-role="enemy-hp-bar"></div>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <span
+                    class="text-blue-100 font-bold text-base bg-blue-900 px-1 rounded-none border border-blue-700">EN</span>
+                <div class="flex-grow h-2 bg-gray-900 border border-white relative">
+                    <div class="absolute top-0 left-0 h-full bg-blue-400 w-[90%]"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Player Info -->
+        <div class="absolute bottom-[35%] left-[10%] z-10 flex flex-col items-center" data-role="player-container">
+            <div class="relative z-20">
+                <img alt="Player Sprite" data-role="player-sprite"
+                    class="w-56 h-56 pixelated object-contain scale-x-[-1]" src="" />
+            </div>
+            <div
+                class="absolute bottom-4 w-56 h-16 bg-[#A8E090] border-4 border-[#88C070] rounded-[50%] z-10 opacity-90">
+            </div>
+            <div class="absolute bottom-0 w-56 h-16 bg-black/20 rounded-[50%] z-0 blur-md translate-y-2"></div>
+        </div>
+
+        <div
+            class="absolute bottom-[35%] left-[32%] z-[100] w-72 bg-stat-bg border-4 border-gray-700 rounded-none shadow-lg p-3">
+            <div class="flex justify-between items-baseline mb-1">
+                <span class="text-2xl font-bold text-gray-900 uppercase tracking-widest leading-none"
+                    data-role="player-name">Player</span>
+            </div>
+            <div class="flex items-center gap-2 mb-1">
+                <span
+                    class="text-primary font-bold text-base bg-yellow-900 px-1 rounded-none text-yellow-100 border border-yellow-700">HP</span>
+                <div class="flex-grow h-4 bg-gray-900 border border-white relative">
+                    <div class="absolute top-0 left-0 h-full bg-yellow-400 w-[100%]" data-role="player-hp-bar"></div>
+                </div>
+            </div>
+            <div class="text-right text-lg text-gray-800 font-bold mb-1 leading-none" data-role="player-hp-text">
+                48 / 115
+            </div>
+            <div class="flex items-center gap-2">
+                <span
+                    class="text-blue-100 font-bold text-base bg-blue-900 px-1 rounded-none border border-blue-700">EN</span>
+                <div class="flex-grow h-2 bg-gray-900 border border-white relative">
+                    <div class="absolute top-0 left-0 h-full bg-blue-400 w-[85%]"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- HUD / Controls -->
+        <div
+            class="absolute bottom-0 w-full h-[30%] bg-hud-bg border-t-4 border-hud-border flex shadow-[0_-4px_10px_rgba(0,0,0,0.5)]">
+            <div class="w-[40%] h-full p-3 border-r-4 border-hud-border/50">
+                <div
+                    class="bg-gray-900 border-2 border-gray-600 h-full rounded-none p-2 overflow-y-auto retro-scrollbar shadow-inner relative font-mono text-lg">
+                    <div class="space-y-2" data-role="battle-log">
+                        <p class="text-gray-300 leading-tight">Waiting for battle...</p>
+                    </div>
+                </div>
+            </div>
+            <div class="w-[60%] h-full p-3">
+                <div class="grid grid-cols-2 grid-rows-2 gap-3 h-full">
+                    <!-- Move Buttons -->
+                    <button
+                        class="group relative bg-gray-100 border-b-4 border-r-4 border-gray-400 rounded-none hover:bg-white hover:border-primary active:border-0 active:translate-y-1 active:translate-x-1 transition-all flex flex-col items-start justify-center px-4"
+                        data-role="move-btn">
+                        <span class="text-2xl font-bold text-gray-900 uppercase group-hover:text-primary leading-none"
+                            data-role="move-name">-</span>
+                        <div class="w-full flex justify-between text-lg text-gray-600 font-bold mt-1">
+                            <span data-role="move-type">-</span>
+                            <span data-role="move-pp">-</span>
+                        </div>
+                    </button>
+                    <button
+                        class="group relative bg-gray-100 border-b-4 border-r-4 border-gray-400 rounded-none hover:bg-white hover:border-primary active:border-0 active:translate-y-1 active:translate-x-1 transition-all flex flex-col items-start justify-center px-4"
+                        data-role="move-btn">
+                        <span class="text-2xl font-bold text-gray-900 uppercase group-hover:text-primary leading-none"
+                            data-role="move-name">-</span>
+                        <div class="w-full flex justify-between text-lg text-gray-600 font-bold mt-1">
+                            <span data-role="move-type">-</span>
+                            <span data-role="move-pp">-</span>
+                        </div>
+                    </button>
+                    <button
+                        class="group relative bg-gray-100 border-b-4 border-r-4 border-gray-400 rounded-none hover:bg-white hover:border-primary active:border-0 active:translate-y-1 active:translate-x-1 transition-all flex flex-col items-start justify-center px-4"
+                        data-role="move-btn">
+                        <span class="text-2xl font-bold text-gray-900 uppercase group-hover:text-primary leading-none"
+                            data-role="move-name">-</span>
+                        <div class="w-full flex justify-between text-lg text-gray-600 font-bold mt-1">
+                            <span data-role="move-type">-</span>
+                            <span data-role="move-pp">-</span>
+                        </div>
+                    </button>
+                    <button
+                        class="group relative bg-gray-100 border-b-4 border-r-4 border-gray-400 rounded-none hover:bg-white hover:border-primary active:border-0 active:translate-y-1 active:translate-x-1 transition-all flex flex-col items-start justify-center px-4"
+                        data-role="move-btn">
+                        <span class="text-2xl font-bold text-gray-900 uppercase group-hover:text-primary leading-none"
+                            data-role="move-name">-</span>
+                        <div class="w-full flex justify-between text-lg text-gray-600 font-bold mt-1">
+                            <span data-role="move-type">-</span>
+                            <span data-role="move-pp">-</span>
+                        </div>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="module" src="js/app.js"></script>
+</body>
+
+</html>

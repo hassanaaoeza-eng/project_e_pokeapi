@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Battle Victory Overlay - PokeSim GBA</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/retro.css">
+    <!-- Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;family=VT323&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#38e07b",
+                        "background-light": "#f6f8f7",
+                        "background-dark": "#122017",
+                        "gba-gold": "#ffd700",
+                        "gba-gold-dark": "#b8860b",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans", "sans-serif"],
+                        "retro": ["VT323", "monospace"]
+                    },
+                },
+            },
+        }
+    </script>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        .retro-border {
+            border: 4px solid #000;
+            box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.1);
+        }
+
+        .victory-banner {
+            text-shadow: 4px 4px 0px rgba(0, 0, 0, 0.2);
+        }
+
+        .pokemon-jump {
+            animation: jump 0.6s infinite ease-in-out;
+        }
+
+        @keyframes jump {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+
+        .sparkle-container::after {
+            content: '✦';
+            position: absolute;
+            color: #ffd700;
+            font-size: 24px;
+            top: -10px;
+            right: -10px;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 0;
+                transform: scale(0.5);
+            }
+
+            50% {
+                opacity: 1;
+                transform: scale(1.2);
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-background-light dark:bg-background-dark font-display overflow-hidden">
+
+    <!-- Victory Overlay Screen -->
+    <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div
+            class="layout-content-container flex flex-col items-center max-w-[640px] w-full animate-in fade-in zoom-in duration-300">
+            <!-- Victory Header -->
+            <div class="mb-8">
+                <h1 class="victory-banner text-[#fbbf24] font-retro text-[64px] md:text-[80px] leading-none tracking-widest text-center px-4 drop-shadow-lg"
+                    data-role="victory-title">
+                    VICTORY!
+                </h1>
+            </div>
+            <!-- Pokemon Sprite Display -->
+            <div class="relative mb-6 sparkle-container">
+                <div class="pokemon-jump w-48 h-48 bg-contain bg-no-repeat bg-center" data-role="winner-sprite"
+                    style="background-image: url('');">
+                </div>
+                <!-- Platform base -->
+                <div class="w-32 h-6 bg-black/20 rounded-full blur-md mx-auto mt-[-10px]"></div>
+            </div>
+            <!-- Summary Box -->
+            <div class="w-full bg-white dark:bg-zinc-900 retro-border p-6 md:p-8 flex flex-col gap-4">
+                <h3
+                    class="text-lg font-bold text-center border-b-2 border-zinc-100 dark:border-zinc-800 pb-2 mb-2 uppercase tracking-tight">
+                    Battle Rewards</h3>
+                <div class="space-y-3">
+                    <div
+                        class="flex justify-between items-center bg-primary/10 p-3 rounded-lg border-l-4 border-primary">
+                        <span class="text-zinc-600 dark:text-zinc-400 font-medium">Pokemon Status</span>
+                        <span class="text-zinc-900 dark:text-zinc-100 font-bold">Gained 450 EXP!</span>
+                    </div>
+                    <div
+                        class="flex justify-between items-center bg-amber-50 dark:bg-amber-900/20 p-3 rounded-lg border-l-4 border-amber-400">
+                        <span class="text-zinc-600 dark:text-zinc-400 font-medium">Loot Found</span>
+                        <div class="flex items-center gap-2">
+                            <span class="text-zinc-900 dark:text-zinc-100 font-bold">200 PokeDollars</span>
+                            <span class="material-symbols-outlined text-amber-500 text-sm">monetization_on</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Action Button -->
+            <div class="mt-10 w-full max-w-[280px]">
+                <button
+                    class="w-full h-14 bg-gradient-to-b from-gba-gold to-gba-gold-dark text-black border-2 border-black font-retro text-2xl font-bold tracking-widest hover:brightness-110 active:translate-y-1 transition-all rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
+                    data-role="continue-btn">
+                    CONTINUE
+                </button>
+            </div>
+        </div>
+    </div>
+    <script type="module" src="js/app.js"></script>
+</body>
+
+</html>

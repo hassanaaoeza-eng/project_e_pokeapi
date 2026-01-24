@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Character Selection - Battle Simulator</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/retro.css">
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&amp;family=VT323&amp;display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#D4AF37", // Gold
+                        "background-light": "#F5E6D3", // Updated Cream #F5E6D3
+                        "background-dark": "#2D3748",
+                        "gba-cream": "#F5E6D3", // Updated Cream #F5E6D3
+                        "gba-dark": "#2d3436",
+                        "gba-border": "#000000", // Strict black
+                        "hp-green": "#48C9B0",
+                        "hp-yellow": "#F4D03F",
+                        "hp-red": "#E74C3C",
+                    },
+                    fontFamily: {
+                        display: ["'VT323'", "monospace"],
+                        pixel: ["'Press Start 2P'", "cursive"],
+                    },
+                    boxShadow: {
+                        'retro': '4px 4px 0px 0px #000000', // Solid black shadow
+                        'retro-hover': '2px 2px 0px 0px #000000',
+                    }
+                },
+            },
+        };
+    </script>
+    <style>
+        ::-webkit-scrollbar {
+            width: 12px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #e2e8f0;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #4a5568;
+            border: 2px solid #e2e8f0;
+        }
+
+        .bg-scanlines {
+            background: linear-gradient(to bottom,
+                    rgba(255, 255, 255, 0),
+                    rgba(255, 255, 255, 0) 50%,
+                    rgba(0, 0, 0, 0.05) 50%,
+                    rgba(0, 0, 0, 0.05));
+            background-size: 100% 4px;
+        }
+
+        .btn-gold-gradient {
+            background: linear-gradient(180deg, #FCD34D 0%, #D97706 100%);
+        }
+
+        .btn-gold-gradient:hover {
+            background: linear-gradient(180deg, #FDE68A 0%, #B45309 100%);
+        }
+    </style>
+</head>
+
+<body
+    class="bg-background-light dark:bg-background-dark min-h-screen font-display antialiased selection:bg-primary selection:text-white transition-colors duration-300">
+    <div class="fixed inset-0 pointer-events-none z-50 bg-scanlines opacity-50"></div>
+    <div class="max-w-6xl mx-auto p-4 md:p-8 relative z-10">
+        <header class="mb-8 text-center">
+            <div
+                class="inline-block bg-gba-cream border-4 border-black p-4 shadow-retro transform rotate-1 dark:bg-gray-800 dark:border-gray-400">
+                <h1
+                    class="text-4xl md:text-6xl font-pixel text-gray-900 dark:text-primary uppercase tracking-wider animate-pulse">
+                    Choose Your Fighter
+                </h1>
+            </div>
+            <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+                <div class="relative group">
+                    <label class="block text-2xl font-display mb-1 text-gray-800 dark:text-gray-200">Search Your
+                        Fighter</label>
+                    <div class="relative">
+                        <input
+                            class="w-full h-14 pl-4 pr-10 bg-white dark:bg-gray-700 border-4 border-black text-3xl font-display focus:ring-0 focus:outline-none focus:bg-yellow-50 placeholder-gray-400 rounded-none shadow-retro transition-all"
+                            id="search-fighter" placeholder="Enter Name..." type="text" />
+                        <span
+                            class="material-icons absolute right-3 top-1/2 -translate-y-1/2 text-3xl text-gray-400">search</span>
+                    </div>
+                </div>
+                <div class="relative group">
+                    <label class="block text-2xl font-display mb-1 text-gray-800 dark:text-gray-200">Search
+                        Enemy</label>
+                    <div class="relative">
+                        <input
+                            class="w-full h-14 pl-4 pr-10 bg-white dark:bg-gray-700 border-4 border-black text-3xl font-display focus:ring-0 focus:outline-none focus:bg-red-50 placeholder-gray-400 rounded-none shadow-retro transition-all"
+                            id="search-enemy" placeholder="Enter Name..." type="text" />
+                        <span
+                            class="material-icons absolute right-3 top-1/2 -translate-y-1/2 text-3xl text-gray-400">search</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8" id="character-grid">
+            <div class="group relative bg-white dark:bg-gray-700 border-4 border-black dark:border-gray-400 rounded-none p-2 shadow-retro hover:translate-y-1 hover:shadow-retro-hover transition-all duration-100 cursor-pointer overflow-hidden character-card"
+                data-role="fighter-card" data-name="charmeleon">
+                <div
+                    class="bg-blue-50 dark:bg-gray-800 border-2 border-black dark:border-gray-600 h-full p-4 rounded-none flex flex-col items-center">
+                    <div
+                        class="w-full h-48 bg-gradient-to-b from-blue-200 to-green-200 dark:from-gray-700 dark:to-gray-900 rounded-none border-2 border-black dark:border-gray-500 mb-4 flex items-center justify-center relative group-hover:bg-primary/20 transition-colors">
+                        <img alt="Charmeleon Sprite"
+                            class="w-32 h-32 object-contain image-pixelated scale-125 group-hover:scale-150 transition-transform duration-200"
+                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuBo1aAkfB0oBu-GZAmEDhZHq3uLAvGu7SNGMUJz4S75Nmc-5_wgv3dBN5F2VIgdPbksB6psY6NKMRjCtpiqHinicv2LYGJ87Fc4Pm4CpzrQETWOywNfhxVVuzQfN395olJZ3d436kVUsNiSeFWPgWF5qE_62eOiRfYa9LaR-JpoE_M0BlzPAPMrNY01Q8QIo5EYKJ5uLkfTMwWo38yxyR13Oh70NrZLM0W2QncU5_3surbOFwBpBxPr5FY7TetJVq-JXUYDWBdcSd8" />
+                        <div
+                            class="absolute top-2 right-2 bg-gray-800 text-white text-xs px-2 py-1 rounded-none font-bold font-pixel border border-white">
+                            LVL 24</div>
+                    </div>
+                    <div
+                        class="w-full bg-gba-cream dark:bg-gray-600 border-2 border-black dark:border-gray-900 p-3 rounded-none shadow-sm">
+                        <div class="flex justify-between items-center mb-2">
+                            <h2
+                                class="text-3xl font-bold text-gray-900 dark:text-white uppercase tracking-tight font-display">
+                                Charmeleon</h2>
+                            <span class="text-red-600 dark:text-red-400 font-bold font-display text-xl">🔥 Fire</span>
+                        </div>
+                        <div
+                            class="w-full bg-gray-300 dark:bg-gray-800 h-4 rounded-none border border-black relative mb-1">
+                            <div class="absolute top-0 left-0 h-full bg-hp-green rounded-none" style="width: 85%;">
+                            </div>
+                            <div
+                                class="absolute top-0 left-0 w-full h-full flex items-center justify-center text-[12px] font-bold text-gray-800 dark:text-gray-200 z-10 font-display tracking-widest">
+                                HP 85/100</div>
+                        </div>
+                        <div class="w-full bg-gray-300 dark:bg-gray-800 h-2 rounded-none border border-black relative">
+                            <div class="absolute top-0 left-0 h-full bg-yellow-400 rounded-none" style="width: 60%;">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-4 w-full grid grid-cols-2 gap-2 text-lg">
+                        <div
+                            class="bg-gray-100 dark:bg-gray-900 px-2 py-1 rounded-none border border-black dark:border-gray-700 text-gray-700 dark:text-gray-300 flex justify-between font-display text-xl">
+                            <span>ATK</span> <span class="font-bold">64</span>
+                        </div>
+                        <div
+                            class="bg-gray-100 dark:bg-gray-900 px-2 py-1 rounded-none border border-black dark:border-gray-700 text-gray-700 dark:text-gray-300 flex justify-between font-display text-xl">
+                            <span>DEF</span> <span class="font-bold">58</span>
+                        </div>
+                    </div>
+                    <button
+                        class="mt-4 w-full btn-gold-gradient text-white font-pixel text-xs py-4 rounded-none border-b-4 border-black active:border-b-0 active:mt-5 active:mb-[-1px] transition-all shadow-sm text-shadow-sm uppercase">
+                        Select
+                    </button>
+                </div>
+            </div>
+            <div class="group relative bg-white dark:bg-gray-700 border-4 border-black dark:border-gray-400 rounded-none p-2 shadow-retro hover:translate-y-1 hover:shadow-retro-hover transition-all duration-100 cursor-pointer overflow-hidden character-card"
+                data-role="fighter-card" data-name="pidgeotto">
+                <div
+                    class="bg-blue-50 dark:bg-gray-800 border-2 border-black dark:border-gray-600 h-full p-4 rounded-none flex flex-col items-center">
+                    <div
+                        class="w-full h-48 bg-gradient-to-b from-blue-200 to-green-200 dark:from-gray-700 dark:to-gray-900 rounded-none border-2 border-black dark:border-gray-500 mb-4 flex items-center justify-center relative group-hover:bg-primary/20 transition-colors">
+                        <img alt="Pidgeotto Sprite"
+                            class="w-32 h-32 object-contain image-pixelated scale-125 group-hover:scale-150 transition-transform duration-200"
+                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuDVTQe_bYap8_90mknqkcQApDDQ6tvErW8nx15SoUcQvILmwXJsZiYAzWhUcLKi9DzthmV4OTJib6k1VkE8yyX1YxP-K45NFQ38lVpZJIu37HvjUvaP1Qhxc4vpcbg8YVepJk7-4fpuP8ZdEfw6QiBdNEn3E_yJNa_VDP-q1HMvKPtMYRxpldZoU1JXB1hKz1JKQlV9DVOKiKVWi_zcRPzW8piTWaRfwX6fVcSWDpXooeOeJGHIpDx-AKcCgCrsf-_-f18jw8uAqPw" />
+                        <div
+                            class="absolute top-2 right-2 bg-gray-800 text-white text-xs px-2 py-1 rounded-none font-bold font-pixel border border-white">
+                            LVL 22</div>
+                    </div>
+                    <div
+                        class="w-full bg-gba-cream dark:bg-gray-600 border-2 border-black dark:border-gray-900 p-3 rounded-none shadow-sm">
+                        <div class="flex justify-between items-center mb-2">
+                            <h2
+                                class="text-3xl font-bold text-gray-900 dark:text-white uppercase tracking-tight font-display">
+                                Pidgeotto</h2>
+                            <span class="text-blue-600 dark:text-blue-300 font-bold font-display text-xl">💨 Fly</span>
+                        </div>
+                        <div
+                            class="w-full bg-gray-300 dark:bg-gray-800 h-4 rounded-none border border-black relative mb-1">
+                            <div class="absolute top-0 left-0 h-full bg-hp-yellow rounded-none" style="width: 45%;">
+                            </div>
+                            <div
+                                class="absolute top-0 left-0 w-full h-full flex items-center justify-center text-[12px] font-bold text-gray-800 dark:text-gray-200 z-10 font-display tracking-widest">
+                                HP 45/100</div>
+                        </div>
+                        <div class="w-full bg-gray-300 dark:bg-gray-800 h-2 rounded-none border border-black relative">
+                            <div class="absolute top-0 left-0 h-full bg-yellow-400 rounded-none" style="width: 80%;">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-4 w-full grid grid-cols-2 gap-2 text-lg">
+                        <div
+                            class="bg-gray-100 dark:bg-gray-900 px-2 py-1 rounded-none border border-black dark:border-gray-700 text-gray-700 dark:text-gray-300 flex justify-between font-display text-xl">
+                            <span>ATK</span> <span class="font-bold">60</span>
+                        </div>
+                        <div
+                            class="bg-gray-100 dark:bg-gray-900 px-2 py-1 rounded-none border border-black dark:border-gray-700 text-gray-700 dark:text-gray-300 flex justify-between font-display text-xl">
+                            <span>SPD</span> <span class="font-bold">71</span>
+                        </div>
+                    </div>
+                    <button
+                        class="mt-4 w-full bg-gray-500 hover:bg-gray-600 text-white font-pixel text-xs py-4 rounded-none border-b-4 border-black active:border-b-0 active:mt-5 active:mb-[-1px] transition-all uppercase">
+                        Select
+                    </button>
+                </div>
+            </div>
+            <div class="group relative bg-white dark:bg-gray-700 border-4 border-black dark:border-gray-400 rounded-none p-2 shadow-retro hover:translate-y-1 hover:shadow-retro-hover transition-all duration-100 cursor-pointer overflow-hidden character-card"
+                data-role="fighter-card" data-name="pikachu">
+                <div
+                    class="bg-blue-50 dark:bg-gray-800 border-2 border-black dark:border-gray-600 h-full p-4 rounded-none flex flex-col items-center">
+                    <div
+                        class="w-full h-48 bg-gradient-to-b from-blue-200 to-green-200 dark:from-gray-700 dark:to-gray-900 rounded-none border-2 border-black dark:border-gray-500 mb-4 flex items-center justify-center relative group-hover:bg-primary/20 transition-colors">
+                        <img alt="Pikachu Sprite"
+                            class="w-32 h-32 object-contain image-pixelated scale-125 group-hover:scale-150 transition-transform duration-200"
+                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuAJN2rXRfxRaRfqSEzx66OTudU-dBx_dG2hgbnC06LlHXZhJIrroLRTbIL-a-FdWU-EqIXwTaygjrp6cH0FKbo6egRx_dlxVh96g1mcvPvW94ghsyhrFcbgkcewVQK9VukeU1AZhGJZjuN2y6W0wRwdOnl2vH_UnovfJOE8xVljiyl5ELMfN1lxmbPcRyD3vq3WYa8Cz0XX67ba7uSWjxOuBUR7yJOchXoE9qA6k7oPdWCqNSoeAJyKoqFMQi1HgWm_7ofiUj-t5RQ" />
+                        <div
+                            class="absolute top-2 right-2 bg-gray-800 text-white text-xs px-2 py-1 rounded-none font-bold font-pixel border border-white">
+                            LVL 25</div>
+                    </div>
+                    <div
+                        class="w-full bg-gba-cream dark:bg-gray-600 border-2 border-black dark:border-gray-900 p-3 rounded-none shadow-sm">
+                        <div class="flex justify-between items-center mb-2">
+                            <h2
+                                class="text-3xl font-bold text-gray-900 dark:text-white uppercase tracking-tight font-display">
+                                Pikachu</h2>
+                            <span class="text-yellow-600 dark:text-yellow-300 font-bold font-display text-xl">⚡
+                                Elec</span>
+                        </div>
+                        <div
+                            class="w-full bg-gray-300 dark:bg-gray-800 h-4 rounded-none border border-black relative mb-1">
+                            <div class="absolute top-0 left-0 h-full bg-hp-green rounded-none" style="width: 90%;">
+                            </div>
+                            <div
+                                class="absolute top-0 left-0 w-full h-full flex items-center justify-center text-[12px] font-bold text-gray-800 dark:text-gray-200 z-10 font-display tracking-widest">
+                                HP 90/100</div>
+                        </div>
+                        <div class="w-full bg-gray-300 dark:bg-gray-800 h-2 rounded-none border border-black relative">
+                            <div class="absolute top-0 left-0 h-full bg-yellow-400 rounded-none" style="width: 95%;">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-4 w-full grid grid-cols-2 gap-2 text-lg">
+                        <div
+                            class="bg-gray-100 dark:bg-gray-900 px-2 py-1 rounded-none border border-black dark:border-gray-700 text-gray-700 dark:text-gray-300 flex justify-between font-display text-xl">
+                            <span>ATK</span> <span class="font-bold">55</span>
+                        </div>
+                        <div
+                            class="bg-gray-100 dark:bg-gray-900 px-2 py-1 rounded-none border border-black dark:border-gray-700 text-gray-700 dark:text-gray-300 flex justify-between font-display text-xl">
+                            <span>SPD</span> <span class="font-bold">90</span>
+                        </div>
+                    </div>
+                    <button
+                        class="mt-4 w-full bg-gray-500 hover:bg-gray-600 text-white font-pixel text-xs py-4 rounded-none border-b-4 border-black active:border-b-0 active:mt-5 active:mb-[-1px] transition-all uppercase">
+                        Select
+                    </button>
+                </div>
+            </div>
+            <div class="group relative bg-white dark:bg-gray-700 border-4 border-black dark:border-gray-400 rounded-none p-2 shadow-retro hover:translate-y-1 hover:shadow-retro-hover transition-all duration-100 cursor-pointer overflow-hidden character-card"
+                data-role="fighter-card" data-name="bulbasaur">
+                <div
+                    class="bg-blue-50 dark:bg-gray-800 border-2 border-black dark:border-gray-600 h-full p-4 rounded-none flex flex-col items-center">
+                    <div
+                        class="w-full h-48 bg-gradient-to-b from-blue-200 to-green-200 dark:from-gray-700 dark:to-gray-900 rounded-none border-2 border-black dark:border-gray-500 mb-4 flex items-center justify-center relative group-hover:bg-primary/20 transition-colors">
+                        <img alt="Bulbasaur Sprite"
+                            class="w-32 h-32 object-contain image-pixelated scale-125 group-hover:scale-150 transition-transform duration-200"
+                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuCKEO_JycdZSjHCqmUBu23vDxZ3ru-mj8wn4oqJUwQq-iHmNYUVCQY9RwCJvGpxuFW3tBo_tUkHClfs_aG6MF4ock7Wbjb_4kxBtTuNsNNY2RIT-NyGBqnR0z6XvLqbq_e5anXH4UM4BQrH-NHjsq8Rt5TT7tcHQrQ4OS8pwYqvxYzT561fzO2szCH3YKc-NFbqEyBL7ik8AI25Xj7twvmnMlM1F4uHOYNHQsniwCozlXq_Q_tKliOfV3rUkh5WHUf2PPTnVXaYow0" />
+                        <div
+                            class="absolute top-2 right-2 bg-gray-800 text-white text-xs px-2 py-1 rounded-none font-bold font-pixel border border-white">
+                            LVL 18</div>
+                    </div>
+                    <div
+                        class="w-full bg-gba-cream dark:bg-gray-600 border-2 border-black dark:border-gray-900 p-3 rounded-none shadow-sm">
+                        <div class="flex justify-between items-center mb-2">
+                            <h2
+                                class="text-3xl font-bold text-gray-900 dark:text-white uppercase tracking-tight font-display">
+                                Bulbasaur</h2>
+                            <span class="text-green-600 dark:text-green-300 font-bold font-display text-xl">🌿
+                                Grass</span>
+                        </div>
+                        <div
+                            class="w-full bg-gray-300 dark:bg-gray-800 h-4 rounded-none border border-black relative mb-1">
+                            <div class="absolute top-0 left-0 h-full bg-hp-green rounded-none" style="width: 100%;">
+                            </div>
+                            <div
+                                class="absolute top-0 left-0 w-full h-full flex items-center justify-center text-[12px] font-bold text-gray-800 dark:text-gray-200 z-10 font-display tracking-widest">
+                                HP 100/100</div>
+                        </div>
+                        <div class="w-full bg-gray-300 dark:bg-gray-800 h-2 rounded-none border border-black relative">
+                            <div class="absolute top-0 left-0 h-full bg-yellow-400 rounded-none" style="width: 100%;">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-4 w-full grid grid-cols-2 gap-2 text-lg">
+                        <div
+                            class="bg-gray-100 dark:bg-gray-900 px-2 py-1 rounded-none border border-black dark:border-gray-700 text-gray-700 dark:text-gray-300 flex justify-between font-display text-xl">
+                            <span>ATK</span> <span class="font-bold">49</span>
+                        </div>
+                        <div
+                            class="bg-gray-100 dark:bg-gray-900 px-2 py-1 rounded-none border border-black dark:border-gray-700 text-gray-700 dark:text-gray-300 flex justify-between font-display text-xl">
+                            <span>DEF</span> <span class="font-bold">49</span>
+                        </div>
+                    </div>
+                    <button
+                        class="mt-4 w-full bg-gray-500 hover:bg-gray-600 text-white font-pixel text-xs py-4 rounded-none border-b-4 border-black active:border-b-0 active:mt-5 active:mb-[-1px] transition-all uppercase">
+                        Select
+                    </button>
+                </div>
+            </div>
+            <div class="group relative bg-white dark:bg-gray-700 border-4 border-black dark:border-gray-400 rounded-none p-2 shadow-retro hover:translate-y-1 hover:shadow-retro-hover transition-all duration-100 cursor-pointer overflow-hidden character-card"
+                data-role="fighter-card" data-name="squirtle">
+                <div
+                    class="bg-blue-50 dark:bg-gray-800 border-2 border-black dark:border-gray-600 h-full p-4 rounded-none flex flex-col items-center">
+                    <div
+                        class="w-full h-48 bg-gradient-to-b from-blue-200 to-green-200 dark:from-gray-700 dark:to-gray-900 rounded-none border-2 border-black dark:border-gray-500 mb-4 flex items-center justify-center relative group-hover:bg-primary/20 transition-colors">
+                        <img alt="Squirtle Sprite"
+                            class="w-32 h-32 object-contain image-pixelated scale-125 group-hover:scale-150 transition-transform duration-200"
+                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuDrTTwWwD4Veh-TgmL-wTj41D4sPyrpwGGs_K0qDN6D_jE1xzaaW3bZvIcKmoBP19RJkmT-O4ZqtAoOgM1A2U_PKO43ApOi0eqfdnWnrTI9qQOJuJkfZjqiYfWI1A2xzTAWZ3vpyiuxsOI-BONOHuX7fOpaJJZtavb6Ak8s9nt4XSULB5SgiiLhxx3rm_lJGC3PNUG8Xce_Dc4gZcS1Aw4HkvJS0lm95aWOFmlCTi2S9VGRKSgSLXdjBwgd84C6zS8_rUAcOVIsKHg" />
+                        <div
+                            class="absolute top-2 right-2 bg-gray-800 text-white text-xs px-2 py-1 rounded-none font-bold font-pixel border border-white">
+                            LVL 20</div>
+                    </div>
+                    <div
+                        class="w-full bg-gba-cream dark:bg-gray-600 border-2 border-black dark:border-gray-900 p-3 rounded-none shadow-sm">
+                        <div class="flex justify-between items-center mb-2">
+                            <h2
+                                class="text-3xl font-bold text-gray-900 dark:text-white uppercase tracking-tight font-display">
+                                Squirtle</h2>
+                            <span class="text-blue-600 dark:text-blue-300 font-bold font-display text-xl">💧
+                                Water</span>
+                        </div>
+                        <div
+                            class="w-full bg-gray-300 dark:bg-gray-800 h-4 rounded-none border border-black relative mb-1">
+                            <div class="absolute top-0 left-0 h-full bg-hp-red rounded-none" style="width: 25%;"></div>
+                            <div
+                                class="absolute top-0 left-0 w-full h-full flex items-center justify-center text-[12px] font-bold text-gray-800 dark:text-gray-200 z-10 font-display tracking-widest">
+                                HP 25/100</div>
+                        </div>
+                        <div class="w-full bg-gray-300 dark:bg-gray-800 h-2 rounded-none border border-black relative">
+                            <div class="absolute top-0 left-0 h-full bg-yellow-400 rounded-none" style="width: 40%;">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-4 w-full grid grid-cols-2 gap-2 text-lg">
+                        <div
+                            class="bg-gray-100 dark:bg-gray-900 px-2 py-1 rounded-none border border-black dark:border-gray-700 text-gray-700 dark:text-gray-300 flex justify-between font-display text-xl">
+                            <span>ATK</span> <span class="font-bold">48</span>
+                        </div>
+                        <div
+                            class="bg-gray-100 dark:bg-gray-900 px-2 py-1 rounded-none border border-black dark:border-gray-700 text-gray-700 dark:text-gray-300 flex justify-between font-display text-xl">
+                            <span>DEF</span> <span class="font-bold">65</span>
+                        </div>
+                    </div>
+                    <button
+                        class="mt-4 w-full bg-gray-500 hover:bg-gray-600 text-white font-pixel text-xs py-4 rounded-none border-b-4 border-black active:border-b-0 active:mt-5 active:mb-[-1px] transition-all uppercase">
+                        Select
+                    </button>
+                </div>
+            </div>
+            <div
+                class="group relative bg-gray-200 dark:bg-gray-800 border-4 border-black dark:border-gray-600 rounded-none p-2 opacity-75">
+                <div
+                    class="bg-gray-100 dark:bg-gray-900 border-2 border-black dark:border-gray-700 h-full p-4 rounded-none flex flex-col items-center justify-center border-dashed">
+                    <div class="text-6xl text-gray-400 dark:text-gray-600 mb-4">
+                        <span class="material-icons" style="font-size: 64px;">lock</span>
+                    </div>
+                    <h2
+                        class="text-2xl font-bold text-gray-500 dark:text-gray-500 uppercase tracking-tight font-pixel text-center">
+                        Locked</h2>
+                    <p class="mt-2 text-center text-gray-500 dark:text-gray-400 font-display text-xl">Complete Campaign
+                        to Unlock</p>
+                </div>
+            </div>
+        </div>
+        <div
+            class="mt-12 mb-8 bg-blue-900 dark:bg-gray-800 text-white p-4 rounded-none border-4 border-white dark:border-gray-600 shadow-retro mx-auto max-w-4xl relative">
+            <div class="absolute -top-3 -left-3 bg-red-500 border-2 border-white rounded-none w-6 h-6 animate-ping">
+            </div>
+            <div class="absolute -top-3 -left-3 bg-red-500 border-2 border-white rounded-none w-6 h-6"></div>
+            <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                <div class="flex-1">
+                    <h3 class="font-pixel text-sm text-yellow-300 mb-2">SYSTEM MESSAGE</h3>
+                    <p class="font-display text-2xl leading-snug" id="system-message">
+                        Use the mouse to select your Pokemon. Ensure you check their Type advantage before confirming!
+                    </p>
+                </div>
+                <div class="flex items-center gap-4 text-sm font-pixel opacity-80">
+                    <div class="flex items-center gap-2 cursor-pointer" data-role="confirm-action">
+                        <span
+                            class="w-8 h-8 border-2 border-white rounded-none flex items-center justify-center">L</span>
+                        <span>Confirm</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span
+                            class="w-8 h-8 border-2 border-white rounded-none flex items-center justify-center">R</span>
+                        <span>Back</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div
+        class="fixed bottom-0 left-0 w-full h-32 bg-gradient-to-t from-green-500/20 to-transparent pointer-events-none -z-10 dark:from-green-900/20">
+    </div>
+    <div class="fixed top-20 right-10 w-32 h-32 bg-yellow-300/20 rounded-full blur-3xl pointer-events-none -z-10"></div>
+    <div class="fixed bottom-20 left-10 w-48 h-48 bg-blue-300/20 rounded-full blur-3xl pointer-events-none -z-10"></div>
+    <script type="module" src="js/app.js"></script>
+</body>
+
+</html>
