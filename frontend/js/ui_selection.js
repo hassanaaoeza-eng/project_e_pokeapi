@@ -1,283 +1,196 @@
-export function initSelection() {
-    const cards = document.querySelectorAll('[data-role="fighter-card"]');
+import { getPokemon, searchPokemon } from './api.js';
+
+const PLACEHOLDER_SPRITE = 'assets/placeholders/fighter-placeholder.svg';
+
+export async function initSelection() {
+    const cards = Array.from(document.querySelectorAll('[data-role="fighter-card"]'));
     const confirmBtn = document.querySelector('[data-role="confirm-action"]');
     const searchPlayerInput = document.getElementById('search-fighter');
     const searchEnemyInput = document.getElementById('search-enemy');
     const systemMsg = document.getElementById('system-message');
 
-    // State
-    let selectedPlayer = null;
-    let selectedEnemy = null;
+    installSelectionStarterStyles();
+    clearOldGameState();
+    renderStarterCards(cards);
+    configureStarterControls({ confirmBtn, searchPlayerInput, searchEnemyInput, systemMsg });
 
-    // Clear previous session
+    // TODO: Load Pokémon data into fighter cards.
+    //
+    // Expected flow:
+    // 1. Call getPokemon()
+    // 2. Store the returned roster in module state
+    // 3. Render each Pokémon into a card
+    // 4. Keep the UI usable if the backend is unavailable
+    //
+    // This call is intentionally not wired to rendering yet.
+    await getPokemon();
+
+    cards.forEach((card) => {
+        card.addEventListener('click', () => {
+            // TODO: Implement card selection flow.
+            //
+            // Expected behavior:
+            // 1. First click chooses the player's Pokémon
+            // 2. Second valid click chooses the enemy Pokémon
+            // 3. Selecting the same card twice should clear or reject the choice
+            // 4. Enable Confirm only when both choices are valid
+            //
+            // Architecture hint:
+            // Keep selectedPlayer and selectedEnemy as plain objects, not DOM nodes.
+            card.classList.add('starter-card-preview');
+            writeSystemMessage(systemMsg, 'TODO: selection logic belongs here. Pick flow is intentionally unfinished.');
+        });
+    });
+
+    if (searchPlayerInput) {
+        searchPlayerInput.addEventListener('input', async (event) => {
+            // TODO: Implement player search.
+            //
+            // Input:
+            // event.target.value
+            //
+            // Expected output:
+            // Visible cards should match the query.
+            //
+            // Hint:
+            // Build this after renderStarterCards can render real Pokémon data.
+            await searchPokemon(event.target.value);
+            writeSystemMessage(systemMsg, 'TODO: player search will filter fighter cards.');
+        });
+    }
+
+    if (searchEnemyInput) {
+        searchEnemyInput.addEventListener('input', async (event) => {
+            // TODO: Implement enemy search.
+            //
+            // Constraint:
+            // Enemy results should exclude the selected player Pokémon.
+            await searchPokemon(event.target.value);
+            writeSystemMessage(systemMsg, 'TODO: enemy search should exclude the player choice.');
+        });
+    }
+
+    if (confirmBtn) {
+        confirmBtn.addEventListener('click', (event) => {
+            event.preventDefault();
+            // TODO: Save selected player/enemy and route to battle.html.
+            //
+            // Expected behavior:
+            // 1. Validate that both selections exist
+            // 2. Save only the minimum data needed to start a battle
+            // 3. Navigate to battle.html
+            //
+            // Do not implement this until selection state exists.
+            writeSystemMessage(systemMsg, 'TODO: confirm stays disabled until students implement selection state.');
+        });
+    }
+}
+
+function clearOldGameState() {
+    // Starter template reset:
+    // Keep the shell clean when students refresh between checkpoints.
     localStorage.removeItem('selectedPlayer');
     localStorage.removeItem('selectedEnemy');
     localStorage.removeItem('battleState');
     localStorage.removeItem('winner');
+}
 
-    // Initialize: Disable enemy search
+function configureStarterControls({ confirmBtn, searchPlayerInput, searchEnemyInput, systemMsg }) {
+    writeSystemMessage(systemMsg, 'Starter mode: cards are placeholders. Implement loading, search, and selection.');
+
+    if (searchPlayerInput) {
+        searchPlayerInput.value = '';
+        searchPlayerInput.placeholder = 'TODO: search roster...';
+    }
+
     if (searchEnemyInput) {
+        searchEnemyInput.value = '';
+        searchEnemyInput.placeholder = 'TODO: choose player first...';
         searchEnemyInput.disabled = true;
         searchEnemyInput.classList.add('search-disabled');
     }
 
-    updateSystemMessage();
-
-    // --- Helper Functions ---
-    function updateSystemMessage() {
-        if (!systemMsg) return;
-
-        if (!selectedPlayer) {
-            systemMsg.textContent = "Pick YOUR fighter (click a card or search).";
-        } else if (!selectedEnemy) {
-            systemMsg.textContent = "Now pick your ENEMY.";
-        } else {
-            systemMsg.textContent = "Ready! Press L to Confirm.";
-        }
-    }
-
-    function filterCards(query, excludeName = null) {
-        const lowerQuery = query.toLowerCase().trim();
-
-        cards.forEach(card => {
-            const name = card.getAttribute('data-name').toLowerCase();
-
-            // Hide if matches exclude (player when searching enemy)
-            if (excludeName && name === excludeName.toLowerCase()) {
-                card.style.display = 'none';
-                return;
-            }
-
-            // Show if matches query or query is empty
-            if (!lowerQuery || name.includes(lowerQuery)) {
-                card.style.display = '';
-            } else {
-                card.style.display = 'none';
-            }
-        });
-    }
-
-    function findBestMatch(query, excludeName = null) {
-        const lowerQuery = query.toLowerCase().trim();
-        if (!lowerQuery) return null;
-
-        const visible = Array.from(cards).filter(card => {
-            const name = card.getAttribute('data-name').toLowerCase();
-            return card.style.display !== 'none' &&
-                (!excludeName || name !== excludeName.toLowerCase());
-        });
-
-        // Exact match
-        let match = visible.find(c => c.getAttribute('data-name').toLowerCase() === lowerQuery);
-        if (match) return match;
-
-        // Starts with
-        match = visible.find(c => c.getAttribute('data-name').toLowerCase().startsWith(lowerQuery));
-        if (match) return match;
-
-        // Contains
-        match = visible.find(c => c.getAttribute('data-name').toLowerCase().includes(lowerQuery));
-        return match || null;
-    }
-
-    function selectPlayer(name) {
-        // Clear previous player selection
-        if (selectedPlayer) {
-            const oldCard = document.querySelector(`[data-name="${selectedPlayer}"]`);
-            if (oldCard) oldCard.classList.remove('card-selected-player');
-        }
-
-        selectedPlayer = name;
-        const card = document.querySelector(`[data-name="${name}"]`);
-        if (card) card.classList.add('card-selected-player');
-
-        // Enable enemy search
-        if (searchEnemyInput) {
-            searchEnemyInput.disabled = false;
-            searchEnemyInput.classList.remove('search-disabled');
-        }
-
-        updateSystemMessage();
-    }
-
-    function selectEnemy(name) {
-        // Cannot select player as enemy
-        if (name === selectedPlayer) return;
-
-        // Clear previous enemy selection
-        if (selectedEnemy) {
-            const oldCard = document.querySelector(`[data-name="${selectedEnemy}"]`);
-            if (oldCard) oldCard.classList.remove('card-selected-enemy');
-        }
-
-        selectedEnemy = name;
-        const card = document.querySelector(`[data-name="${name}"]`);
-        if (card) card.classList.add('card-selected-enemy');
-
-        updateSystemMessage();
-    }
-
-    function clearPlayer() {
-        if (selectedPlayer) {
-            const card = document.querySelector(`[data-name="${selectedPlayer}"]`);
-            if (card) card.classList.remove('card-selected-player');
-        }
-        selectedPlayer = null;
-
-        // Also clear enemy and disable enemy search
-        clearEnemy();
-        if (searchEnemyInput) {
-            searchEnemyInput.disabled = true;
-            searchEnemyInput.classList.add('search-disabled');
-            searchEnemyInput.value = '';
-        }
-
-        // Reset card visibility
-        cards.forEach(c => c.style.display = '');
-
-        updateSystemMessage();
-    }
-
-    function clearEnemy() {
-        if (selectedEnemy) {
-            const card = document.querySelector(`[data-name="${selectedEnemy}"]`);
-            if (card) card.classList.remove('card-selected-enemy');
-        }
-        selectedEnemy = null;
-        updateSystemMessage();
-    }
-
-    function pulseElement(el) {
-        if (!el) return;
-        el.classList.add('pulse-attention');
-        setTimeout(() => el.classList.remove('pulse-attention'), 1000);
-    }
-
-    // --- Event Listeners ---
-
-    // Player Search
-    if (searchPlayerInput) {
-        searchPlayerInput.addEventListener('input', (e) => {
-            filterCards(e.target.value);
-        });
-
-        searchPlayerInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                const match = findBestMatch(e.target.value);
-                if (match) {
-                    const name = match.getAttribute('data-name');
-                    selectPlayer(name);
-                    e.target.value = '';
-                    filterCards(''); // Reset filter
-                }
-            }
-        });
-    }
-
-    // Enemy Search
-    if (searchEnemyInput) {
-        searchEnemyInput.addEventListener('input', (e) => {
-            filterCards(e.target.value, selectedPlayer);
-        });
-
-        searchEnemyInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                const match = findBestMatch(e.target.value, selectedPlayer);
-                if (match) {
-                    const name = match.getAttribute('data-name');
-                    selectEnemy(name);
-                    e.target.value = '';
-                    filterCards('', selectedPlayer); // Reset filter
-                }
-            }
-        });
-    }
-
-    // Card Clicks
-    cards.forEach(card => {
-        card.addEventListener('click', () => {
-            const name = card.getAttribute('data-name');
-
-            // Phase 1: Select Player
-            if (!selectedPlayer) {
-                selectPlayer(name);
-            }
-            // Clicking selected player -> Reset
-            else if (selectedPlayer === name) {
-                clearPlayer();
-            }
-            // Phase 2: Select Enemy
-            else if (!selectedEnemy) {
-                selectEnemy(name);
-            }
-            // Clicking selected enemy -> Clear enemy only
-            else if (selectedEnemy === name) {
-                clearEnemy();
-            }
-            // Replace enemy
-            else {
-                selectEnemy(name);
-            }
-        });
-    });
-
-    // Confirm Button
     if (confirmBtn) {
-        confirmBtn.style.cursor = 'pointer';
-        confirmBtn.addEventListener('click', () => {
-            if (!selectedPlayer) {
-                pulseElement(searchPlayerInput);
-                return;
-            }
-            if (!selectedEnemy) {
-                pulseElement(searchEnemyInput);
-                return;
-            }
+        confirmBtn.setAttribute('aria-disabled', 'true');
+        confirmBtn.classList.add('starter-disabled-action');
+    }
+}
 
-            localStorage.setItem('selectedPlayer', selectedPlayer);
-            localStorage.setItem('selectedEnemy', selectedEnemy);
-            window.location.href = 'battle.html';
+function renderStarterCards(cards) {
+    cards.forEach((card, index) => {
+        // TODO: Replace placeholder card content with real Pokémon data.
+        //
+        // Input:
+        // A Pokémon object from getPokemon()
+        //
+        // Expected output:
+        // Card image, name, type, HP, stats, and button state update together.
+        card.dataset.name = `starter-slot-${index + 1}`;
+
+        const img = card.querySelector('img');
+        if (img) {
+            img.src = PLACEHOLDER_SPRITE;
+            img.alt = `Placeholder fighter ${index + 1}`;
+        }
+
+        const nameEl = card.querySelector('h2');
+        if (nameEl) nameEl.textContent = `Fighter Slot ${index + 1}`;
+
+        const typeEl = card.querySelector('h2 + span');
+        if (typeEl) typeEl.textContent = 'Type TODO';
+
+        const levelBadge = card.querySelector('.absolute.top-2.right-2');
+        if (levelBadge) levelBadge.textContent = 'LVL --';
+
+        const hpText = card.querySelector('.tracking-widest');
+        if (hpText) hpText.textContent = 'HP --/--';
+
+        const hpBar = card.querySelector('.bg-hp-green, .bg-hp-yellow, .bg-hp-red');
+        if (hpBar) {
+            hpBar.classList.remove('bg-hp-green', 'bg-hp-yellow', 'bg-hp-red');
+            hpBar.classList.add('bg-gray-500');
+            hpBar.style.width = '0%';
+        }
+
+        const statValues = card.querySelectorAll('.font-bold:not(h2)');
+        statValues.forEach((valueEl) => {
+            if (/^\d+$/.test(valueEl.textContent.trim())) valueEl.textContent = '--';
         });
-    }
 
-    // Inject selection styles if not present
-    if (!document.getElementById('selection-ux-styles')) {
-        const style = document.createElement('style');
-        style.id = 'selection-ux-styles';
-        style.innerHTML = `
-            .card-selected-player {
-                border-color: #D4AF37 !important;
-                box-shadow: 0 0 20px 4px #D4AF37 !important;
-                transform: scale(1.05) !important;
-                z-index: 20 !important;
-                position: relative;
-            }
-            .card-selected-enemy {
-                border-color: #E74C3C !important;
-                box-shadow: 0 0 20px 4px #E74C3C !important;
-                transform: scale(1.05) !important;
-                z-index: 20 !important;
-                position: relative;
-            }
-            .search-disabled {
-                opacity: 0.4;
-                cursor: not-allowed;
-                pointer-events: none;
-            }
-            .pulse-attention {
-                animation: pulse-attn 0.5s ease-in-out 2;
-            }
-            @keyframes pulse-attn {
-                0%, 100% { 
-                    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
-                    border-color: currentColor;
-                }
-                50% { 
-                    box-shadow: 0 0 0 8px rgba(239, 68, 68, 0);
-                    border-color: #EF4444;
-                }
-            }
-        `;
-        document.head.appendChild(style);
-    }
+        const button = card.querySelector('button');
+        if (button) {
+            button.textContent = 'TODO';
+            button.disabled = true;
+            button.classList.add('opacity-80');
+        }
+    });
+}
+
+function writeSystemMessage(systemMsg, message) {
+    if (systemMsg) systemMsg.textContent = message;
+}
+
+function installSelectionStarterStyles() {
+    if (document.getElementById('selection-starter-styles')) return;
+
+    const style = document.createElement('style');
+    style.id = 'selection-starter-styles';
+    style.textContent = `
+        .search-disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+
+        .starter-disabled-action {
+            opacity: 0.45;
+            cursor: not-allowed;
+            filter: grayscale(0.4);
+        }
+
+        .starter-card-preview {
+            outline: 4px dashed rgba(212, 175, 55, 0.8);
+            outline-offset: 4px;
+        }
+    `;
+    document.head.appendChild(style);
 }

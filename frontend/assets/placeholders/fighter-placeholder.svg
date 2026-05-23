@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256" role="img" aria-label="Placeholder fighter">
+  <defs>
+    <linearGradient id="body" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fcd34d"/>
+      <stop offset="1" stop-color="#38bdf8"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <rect width="256" height="256" fill="none"/>
+  <path d="M55 178 L82 68 L113 130 L147 48 L170 134 L210 96 L184 190 Z" fill="#0f172a" stroke="#38e8ff" stroke-width="8" stroke-linejoin="round" filter="url(#glow)"/>
+  <circle cx="126" cy="145" r="54" fill="url(#body)" stroke="#111827" stroke-width="8"/>
+  <circle cx="105" cy="135" r="8" fill="#111827"/>
+  <circle cx="148" cy="135" r="8" fill="#111827"/>
+  <path d="M106 166 Q128 184 150 166" fill="none" stroke="#111827" stroke-width="7" stroke-linecap="round"/>
+  <path d="M42 210 H214" stroke="#f472b6" stroke-width="6" stroke-linecap="round" opacity="0.8"/>
+</svg>

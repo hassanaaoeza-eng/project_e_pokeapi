@@ -1,143 +1,132 @@
-import { startBattle, getBattleState, attack } from './api.js';
+import { sendMove } from './api.js';
 import { applyCriticalEffects } from './ui_critical_health_state.js';
 
-export async function initBattle() {
-    // 1. Load Selection
-    const player = localStorage.getItem('selectedPlayer');
-    const enemy = localStorage.getItem('selectedEnemy');
+const PLAYER_PLACEHOLDER = 'assets/placeholders/fighter-placeholder.svg';
+const ENEMY_PLACEHOLDER = 'assets/placeholders/enemy-placeholder.svg';
 
-    if (!player || !enemy) {
-        window.location.href = 'index.html';
-        return;
-    }
+export function initBattle() {
+    renderBattleShell();
+    bindMovePlaceholders();
 
-    // 2. Initialize or Resume Battle
-    let battleState = getBattleState();
+    // TODO: Battle initialization belongs here.
+    //
+    // Expected flow:
+    // 1. Read selected player/enemy from the selection page
+    // 2. Ask the backend to create a battle
+    // 3. Store the returned battleId
+    // 4. Render the initial battle state
+    // 5. Connect WebSocket multiplayer updates
+    //
+    // Starter rule:
+    // Do not calculate damage or turns in this file. The backend should become
+    // the source of truth once students reach the architecture checkpoint.
+}
 
-    // If new battle (no log, or different participants), start fresh
-    if (!battleState || !battleState.player || battleState.player.name.toLowerCase() !== player.toLowerCase()) {
-        battleState = await startBattle(player, enemy);
-    }
+export function renderBattleShell() {
+    // TODO: Render battle state to screen.
+    //
+    // Input:
+    // battleState from the backend
+    //
+    // Expected output:
+    // Names, sprites, HP bars, move tiles, and battle log all reflect state.
+    setText('[data-role="player-name"]', 'Player TODO');
+    setText('[data-role="enemy-name"]', 'Enemy TODO');
+    setImage('[data-role="player-sprite"]', PLAYER_PLACEHOLDER);
+    setImage('[data-role="enemy-sprite"]', ENEMY_PLACEHOLDER);
+    setHpBar('player', 100, '-- / --');
+    setHpBar('enemy', 100, '-- / --');
+    renderMovePlaceholders();
+    clearBattleLog();
+}
 
-    if (!battleState) {
-        alert("Failed to load battle!");
-        return;
-    }
-
-    render(battleState);
-
-    // 3. Bind Moves
+function bindMovePlaceholders() {
     const moveButtons = document.querySelectorAll('[data-role="move-btn"]');
-    moveButtons.forEach((btn, index) => {
-        btn.onclick = async () => {
-            if (battleState.isOver || battleState.turn !== 0) return; // Prevent clicking during enemy turn or game over
 
-            // Player Move
-            const newState = attack(index);
-            render(newState);
-
-            if (newState.isOver) {
-                endGame(newState.winner);
-                return;
-            }
-
-            // Enemy Counter-Attack (Simulated Delay)
-            disableMoves(true);
-            setTimeout(() => {
-                const enemyMoveIdx = Math.floor(Math.random() * 4);
-                const afterEnemyState = attack(enemyMoveIdx);
-                render(afterEnemyState);
-
-                if (afterEnemyState.isOver) {
-                    endGame(afterEnemyState.winner);
-                } else {
-                    disableMoves(false);
-                }
-            }, 1000);
-        };
-    });
-}
-
-function disableMoves(disable) {
-    const btns = document.querySelectorAll('[data-role="move-btn"]');
-    btns.forEach(b => {
-        b.disabled = disable;
-        b.style.opacity = disable ? '0.5' : '1';
-        b.style.cursor = disable ? 'wait' : 'pointer';
-    });
-}
-
-function endGame(winner) {
-    localStorage.setItem('winner', winner);
-    setTimeout(() => {
-        window.location.href = 'victory.html';
-    }, 1500);
-}
-
-function render(state) {
-    const p = state.player;
-    const e = state.enemy;
-
-    // --- Update Elements ---
-    // Player
-    if (p) {
-        updateEntityUI(p, 'player');
-        // Render Moves
-        const moveBtns = document.querySelectorAll('[data-role="move-btn"]');
-        p.moves.forEach((m, i) => {
-            if (moveBtns[i]) {
-                const nameEl = moveBtns[i].querySelector('[data-role="move-name"]');
-                const typeEl = moveBtns[i].querySelector('[data-role="move-type"]'); // Optional hooks
-                const ppEl = moveBtns[i].querySelector('[data-role="move-pp"]');
-
-                if (nameEl) nameEl.textContent = m.name;
-                if (typeEl) typeEl.textContent = m.type;
-                if (ppEl) ppEl.textContent = `${m.pp}/${m.maxPp}`;
-            }
+    moveButtons.forEach((button, index) => {
+        button.addEventListener('click', async () => {
+            // TODO: Implement move handling.
+            //
+            // Expected flow:
+            // 1. Read selected move from battle state
+            // 2. Send move to backend or WebSocket
+            // 3. Receive updated battle state
+            // 4. Call renderBattleState(updatedState)
+            //
+            // Do NOT add automatic enemy turns here. That checkpoint comes later.
+            await sendMove(null, `move-${index + 1}`);
         });
-    }
+    });
+}
 
-    // Enemy
-    if (e) {
-        updateEntityUI(e, 'enemy');
-    }
+export function renderBattleState(battleState) {
+    // TODO: Complete this renderer after the backend returns battle state.
+    //
+    // Expected input:
+    // {
+    //   player: { name, sprite, currentHp, maxHp, moves },
+    //   enemy: { name, sprite, currentHp, maxHp },
+    //   log: string[],
+    //   winner: null | 'player' | 'enemy'
+    // }
+    //
+    // Expected output:
+    // The DOM updates without reloading the page.
+    console.info('[starter] renderBattleState TODO:', battleState);
+}
 
-    // Log
+function renderMovePlaceholders() {
+    const moveButtons = document.querySelectorAll('[data-role="move-btn"]');
+
+    moveButtons.forEach((button, index) => {
+        setTextIn(button, '[data-role="move-name"]', `Move ${index + 1}`);
+        setTextIn(button, '[data-role="move-type"]', 'TODO');
+        setTextIn(button, '[data-role="move-pp"]', '--/--');
+        button.disabled = false;
+        button.title = 'TODO: wire this move button to battle logic';
+    });
+}
+
+function clearBattleLog() {
     const logEl = document.querySelector('[data-role="battle-log"]');
     if (logEl) {
-        // Show last 3 logs
-        const recentLogs = state.log.slice(-3);
-        logEl.innerHTML = recentLogs.map(l => `<p class="mb-1">${l}</p>`).join('');
+        // TODO: Append battle log entries as actions resolve.
+        //
+        // Expected input:
+        // string[] of recent battle events
+        logEl.innerHTML = '';
     }
 }
 
-function updateEntityUI(entity, role) {
-    const sprite = document.querySelector(`[data-role="${role}-sprite"]`);
-    const name = document.querySelector(`[data-role="${role}-name"]`);
+function setHpBar(role, percent, label) {
     const hpBar = document.querySelector(`[data-role="${role}-hp-bar"]`);
     const hpText = document.querySelector(`[data-role="${role}-hp-text"]`);
     const container = document.querySelector(`[data-role="${role}-container"]`);
 
-    if (sprite) sprite.src = entity.sprite;
-    if (name) name.textContent = entity.name;
-
-    // HP Math
-    const pct = Math.max(0, (entity.currentHp / entity.maxHp) * 100);
-
     if (hpBar) {
-        hpBar.style.width = `${pct}%`;
-        // Color
-        hpBar.className = ''; // Reset
-        hpBar.classList.add('absolute', 'top-0', 'left-0', 'h-full', 'transition-all', 'duration-500');
-        if (pct > 50) hpBar.classList.add('bg-green-500');
-        else if (pct > 20) hpBar.classList.add('bg-yellow-500');
-        else hpBar.classList.add('bg-red-600');
+        // TODO: Update HP bars dynamically from battle state.
+        hpBar.style.width = `${percent}%`;
+        hpBar.classList.remove('bg-green-500', 'bg-yellow-500', 'bg-red-600');
+        hpBar.classList.add('bg-gray-500');
     }
 
-    if (hpText) hpText.textContent = `${entity.currentHp} / ${entity.maxHp}`;
+    if (hpText) hpText.textContent = label;
 
-    // Critical Effects
-    if (container) {
-        applyCriticalEffects(container, pct);
-    }
+    // Starter call only. Students decide when critical effects should apply.
+    applyCriticalEffects(container, percent);
+}
+
+function setText(selector, value) {
+    const el = document.querySelector(selector);
+    if (el) el.textContent = value;
+}
+
+function setImage(selector, src) {
+    const el = document.querySelector(selector);
+    if (el) el.src = src;
+}
+
+function setTextIn(root, selector, value) {
+    const el = root.querySelector(selector);
+    if (el) el.textContent = value;
 }

@@ -1,204 +1,153 @@
-const USE_MOCK = false;
+// ---------------------------------------------------------------------------
+// API STARTER MODULE
+// ---------------------------------------------------------------------------
+// This file intentionally does NOT fetch real data yet.
+//
+// Student goal:
+// Replace the mock data and placeholder functions with real backend/API calls.
+// Keep network code isolated here so UI modules do not need to know where data
+// comes from.
 
-const POKEMON_ROSTER = {
-    "charmeleon": {
-        name: "Charmeleon",
-        sprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/5.png",
-        hp: 120,
-        maxHp: 120,
-        type: ["Fire"],
-        moves: [
-            { name: "Flame Thrower", power: 40, type: "Fire", pp: 15, maxPp: 15 },
-            { name: "Scratch", power: 20, type: "Normal", pp: 35, maxPp: 35 },
-            { name: "Ember", power: 30, type: "Fire", pp: 25, maxPp: 25 },
-            { name: "Growl", power: 0, type: "Status", pp: 40, maxPp: 40 }
-        ]
+export const MOCK_POKEMON = [
+    {
+        id: 'starter-001',
+        name: 'Fighter Slot 01',
+        type: 'TODO',
+        sprite: 'assets/placeholders/fighter-placeholder.svg',
+        hp: null,
+        attack: null,
+        defense: null,
+        moves: [],
     },
-    "pidgeotto": {
-        name: "Pidgeotto",
-        sprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/17.png",
-        hp: 110,
-        maxHp: 110,
-        type: ["Normal", "Flying"],
-        moves: [
-            { name: "Wing Attack", power: 35, type: "Flying", pp: 35, maxPp: 35 },
-            { name: "Quick Attack", power: 40, type: "Normal", pp: 30, maxPp: 30 },
-            { name: "Gust", power: 30, type: "Flying", pp: 35, maxPp: 35 },
-            { name: "Whirlwind", power: 0, type: "Status", pp: 20, maxPp: 20 }
-        ]
+    {
+        id: 'starter-002',
+        name: 'Fighter Slot 02',
+        type: 'TODO',
+        sprite: 'assets/placeholders/fighter-placeholder.svg',
+        hp: null,
+        attack: null,
+        defense: null,
+        moves: [],
     },
-    "bulbasaur": {
-        name: "Bulbasaur",
-        sprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/1.png",
-        hp: 115,
-        maxHp: 115,
-        type: ["Grass", "Poison"],
-        moves: [
-            { name: "Vine Whip", power: 45, type: "Grass", pp: 25, maxPp: 25 },
-            { name: "Tackle", power: 30, type: "Normal", pp: 35, maxPp: 35 },
-            { name: "Razor Leaf", power: 55, type: "Grass", pp: 25, maxPp: 25 },
-            { name: "Growth", power: 0, type: "Status", pp: 20, maxPp: 20 }
-        ]
+    {
+        id: 'starter-003',
+        name: 'Fighter Slot 03',
+        type: 'TODO',
+        sprite: 'assets/placeholders/fighter-placeholder.svg',
+        hp: null,
+        attack: null,
+        defense: null,
+        moves: [],
     },
-    "squirtle": {
-        name: "Squirtle",
-        sprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/7.png",
-        hp: 110,
-        maxHp: 110,
-        type: ["Water"],
-        moves: [
-            { name: "Water Gun", power: 40, type: "Water", pp: 25, maxPp: 25 },
-            { name: "Tackle", power: 30, type: "Normal", pp: 35, maxPp: 35 },
-            { name: "Bubble", power: 40, type: "Water", pp: 30, maxPp: 30 },
-            { name: "Withdraw", power: 0, type: "Status", pp: 40, maxPp: 40 }
-        ]
-    },
-    "pikachu": {
-        name: "Pikachu",
-        sprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/25.png",
-        hp: 95,
-        maxHp: 95,
-        type: ["Electric"],
-        moves: [
-            { name: "Thunder Shock", power: 40, type: "Electric", pp: 30, maxPp: 30 },
-            { name: "Quick Attack", power: 40, type: "Normal", pp: 30, maxPp: 30 },
-            { name: "Electro Ball", power: 60, type: "Electric", pp: 10, maxPp: 10 },
-            { name: "Thunder Wave", power: 0, type: "Status", pp: 20, maxPp: 20 }
-        ]
-    },
-    "gengar": {
-        name: "Gengar",
-        sprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/94.png",
-        hp: 100,
-        maxHp: 100,
-        type: ["Ghost", "Poison"],
-        moves: [
-            { name: "Shadow Ball", power: 80, type: "Ghost", pp: 15, maxPp: 15 },
-            { name: "Lick", power: 30, type: "Ghost", pp: 30, maxPp: 30 },
-            { name: "Sludge Bomb", power: 90, type: "Poison", pp: 10, maxPp: 10 },
-            { name: "Hypnosis", power: 0, type: "Status", pp: 20, maxPp: 20 }
-        ]
-    },
-    "snorlax": {
-        name: "Snorlax",
-        sprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/143.png",
-        hp: 160,
-        maxHp: 160,
-        type: ["Normal"],
-        moves: [
-            { name: "Body Slam", power: 85, type: "Normal", pp: 15, maxPp: 15 },
-            { name: "Rest", power: 0, type: "Status", pp: 10, maxPp: 10 },
-            { name: "Crunch", power: 80, type: "Dark", pp: 15, maxPp: 15 },
-            { name: "Hyper Beam", power: 150, type: "Normal", pp: 5, maxPp: 5 }
-        ]
-    },
-    "charizard": {
-        name: "Charizard",
-        sprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/6.png",
-        hp: 150,
-        maxHp: 150,
-        type: ["Fire", "Flying"],
-        moves: [
-            { name: "Flamethrower", power: 90, type: "Fire", pp: 15, maxPp: 15 },
-            { name: "Dragon Claw", power: 80, type: "Dragon", pp: 15, maxPp: 15 },
-            { name: "Air Slash", power: 75, type: "Flying", pp: 15, maxPp: 15 },
-            { name: "Roar", power: 0, type: "Status", pp: 20, maxPp: 20 }
-        ]
-    }
-};
+];
 
-let battleState = {
-    player: null,
-    enemy: null,
-    turn: 0, // 0: Player, 1: Enemy
-    log: [],
-    winner: null,
-    isOver: false
-};
-
-export async function getPokemon(name) {
-    // Return a structured clone to avoid reference issues
-    const data = POKEMON_ROSTER[name.toLowerCase()];
-    if (data) return Promise.resolve(JSON.parse(JSON.stringify(data)));
-    return Promise.resolve(null);
+export async function getPokemon() {
+    // TODO: Fetch Pokémon from the Python backend.
+    //
+    // Expected output:
+    // [
+    //   {
+    //     id: string,
+    //     name: string,
+    //     type: string,
+    //     sprite: string,
+    //     hp: number,
+    //     attack: number,
+    //     defense: number,
+    //     moves: Array<{ name, type, power, pp }>
+    //   }
+    // ]
+    //
+    // Architecture hint:
+    // The frontend should call your backend, not PokeAPI directly, once the
+    // backend route exists. The backend can clean/shape external API data.
+    return MOCK_POKEMON;
 }
 
-export async function startBattle(playerName, enemyName) {
-    const player = await getPokemon(playerName);
-    const enemy = await getPokemon(enemyName);
+export async function searchPokemon(query) {
+    // TODO: Implement search against the loaded roster.
+    //
+    // Input:
+    // query: string from the search box
+    //
+    // Expected output:
+    // Array of Pokémon objects matching the query
+    //
+    // Hint:
+    // Start with a case-insensitive name match, then improve it later.
+    console.info('[starter] searchPokemon TODO:', query);
+    return [];
+}
 
-    if (!player || !enemy) {
-        console.error("Invalid fighters:", playerName, enemyName);
-        return null;
-    }
+export async function createBattle(playerPokemon, enemyPokemon) {
+    // TODO: Ask the backend to create a battle session.
+    //
+    // Input:
+    // playerPokemon: selected player fighter
+    // enemyPokemon: selected enemy fighter
+    //
+    // Expected output:
+    // {
+    //   battleId,
+    //   player,
+    //   enemy,
+    //   turn,
+    //   log
+    // }
+    //
+    // Architecture hint:
+    // The server should become the source of truth before multiplayer is added.
+    console.info('[starter] createBattle TODO:', playerPokemon, enemyPokemon);
+    return null;
+}
 
-    battleState = {
-        player: { ...player, currentHp: player.hp, maxHp: player.maxHp },
-        enemy: { ...enemy, currentHp: enemy.hp, maxHp: enemy.maxHp },
-        turn: 0,
-        log: [`Battle started! ${player.name} vs ${enemy.name}!`],
-        winner: null,
-        isOver: false
+export async function sendMove(battleId, moveId) {
+    // TODO: Send a selected move to the backend.
+    //
+    // Input:
+    // battleId: server-created battle id
+    // moveId: selected move/action id
+    //
+    // Expected output:
+    // Updated battle state from the backend
+    //
+    // Multiplayer hint:
+    // Later, this same action should be sent through a WebSocket connection.
+    console.info('[starter] sendMove TODO:', battleId, moveId);
+    return null;
+}
+
+export async function processAttackOnBackend(battleId, moveId) {
+    // TODO:
+    // Build the backend attack endpoint or WebSocket event handler.
+    //
+    // Input:
+    // battleId: server-created battle id
+    // moveId: selected move/action id
+    //
+    // Expected backend responsibilities:
+    // 1. Validate whose turn it is
+    // 2. Validate the selected move
+    // 3. Calculate damage
+    // 4. Reduce HP without going below 0
+    // 5. Determine winner/loser if HP reaches 0
+    // 6. Return or broadcast the updated battle state
+    //
+    // This function is a frontend placeholder for the future backend contract.
+    console.info('[starter] processAttackOnBackend TODO:', battleId, moveId);
+    return null;
+}
+
+export function connectBattleSocket(battleId, onMessage) {
+    // TODO: Open a WebSocket connection for real-time multiplayer.
+    //
+    // Expected behavior:
+    // 1. Connect to ws://<host>:<port>/ws
+    // 2. Subscribe to the current battleId
+    // 3. Call onMessage(updatedBattleState) when the server broadcasts updates
+    // 4. Return a cleanup function that closes the socket
+    console.info('[starter] connectBattleSocket TODO:', battleId, onMessage);
+    return () => {
+        // TODO: Close WebSocket connection.
     };
-
-    saveBattleState();
-    return battleState;
-}
-
-export function getBattleState() {
-    const stored = localStorage.getItem('battleState');
-    if (stored) {
-        battleState = JSON.parse(stored);
-    }
-    return battleState;
-}
-
-export function attack(moveIndex) {
-    if (battleState.isOver) return battleState;
-
-    const attacker = battleState.turn === 0 ? battleState.player : battleState.enemy;
-    const defender = battleState.turn === 0 ? battleState.enemy : battleState.player;
-
-    // Safety check for move index
-    const move = attacker.moves[moveIndex] || attacker.moves[0];
-
-    // Calc Damage
-    let damage = 0;
-    if (move.power > 0) {
-        // Random variance 0.85 to 1.15
-        const variance = (Math.random() * 0.3) + 0.85;
-        // Simple formula: Power / 2
-        damage = Math.floor((move.power / 2) * variance);
-
-        // Crit chance 10%
-        if (Math.random() < 0.1) {
-            damage = Math.floor(damage * 1.5);
-            battleState.log.push("Critical Hit!");
-        }
-    }
-
-    defender.currentHp = Math.max(0, defender.currentHp - damage);
-    battleState.log.push(`${attacker.name} used ${move.name}!`);
-    if (damage > 0) {
-        battleState.log.push(`${defender.name} took ${damage} DMG.`);
-    } else if (move.power === 0) {
-        battleState.log.push(`${attacker.name} is storing energy!`);
-    }
-
-    // Check Faint
-    if (defender.currentHp <= 0) {
-        battleState.isOver = true;
-        battleState.winner = (battleState.turn === 0) ? "player" : "enemy";
-        battleState.log.push(`${defender.name} fainted!`);
-    } else {
-        // Switch Turn
-        battleState.turn = battleState.turn === 0 ? 1 : 0;
-    }
-
-    saveBattleState();
-    return battleState;
-}
-
-function saveBattleState() {
-    localStorage.setItem('battleState', JSON.stringify(battleState));
 }
