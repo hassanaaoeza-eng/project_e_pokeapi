@@ -1,101 +1,140 @@
-import { sendMove } from './api.js';
+import { connectBattleSocket, createBattle, sendMove } from './api.js';
 import { applyCriticalEffects } from './ui_critical_health_state.js';
+import { determineBattleOutcome, routeToOverlay, saveOverlayState } from './ui_overlay.js';
 
 const PLAYER_PLACEHOLDER = 'assets/placeholders/fighter-placeholder.svg';
 const ENEMY_PLACEHOLDER = 'assets/placeholders/enemy-placeholder.svg';
 
-export function initBattle() {
-    renderBattleShell();
-    bindMovePlaceholders();
+let battleState = null;
+let cleanupSocket = null;
+let enemyTurnTimer = null;
 
-    // TODO: Battle initialization belongs here.
-    //
-    // Expected flow:
-    // 1. Read selected player/enemy from the selection page
-    // 2. Ask the backend to create a battle
-    // 3. Store the returned battleId
-    // 4. Render the initial battle state
-    // 5. Connect WebSocket multiplayer updates
-    //
-    // Starter rule:
-    // Do not calculate damage or turns in this file. The backend should become
-    // the source of truth once students reach the architecture checkpoint.
+export async function initBattle() {
+    renderLoadingShell();
+
+    const selectedPlayer = readJson('selectedPlayer');
+    const selectedEnemy = readJson('selectedEnemy');
+
+    if (!selectedPlayer || !selectedEnemy) {
+        appendBattleLog(['Choose two fighters before starting a battle.']);
+        setTimeout(() => {
+            window.location.href = 'index.html';
+        }, 1200);
+        return;
+    }
+
+    try {
+        battleState = await createBattle(selectedPlayer, selectedEnemy);
+        localStorage.setItem('battleState', JSON.stringify(battleState));
+        renderBattleState(battleState);
+        cleanupSocket = connectBattleSocket(battleState.battleId, renderBattleState);
+        maybeRunEnemyTurn();
+    } catch (error) {
+        appendBattleLog(['Backend unavailable. Start FastAPI on port 8000.']);
+        console.error(error);
+    }
 }
 
-export function renderBattleShell() {
-    // TODO: Render battle state to screen.
-    //
-    // Input:
-    // battleState from the backend
-    //
-    // Expected output:
-    // Names, sprites, HP bars, move tiles, and battle log all reflect state.
-    setText('[data-role="player-name"]', 'Player TODO');
-    setText('[data-role="enemy-name"]', 'Enemy TODO');
+export function renderLoadingShell() {
+    setText('[data-role="player-name"]', 'Loading');
+    setText('[data-role="enemy-name"]', 'Loading');
     setImage('[data-role="player-sprite"]', PLAYER_PLACEHOLDER);
     setImage('[data-role="enemy-sprite"]', ENEMY_PLACEHOLDER);
     setHpBar('player', 100, '-- / --');
     setHpBar('enemy', 100, '-- / --');
-    renderMovePlaceholders();
-    clearBattleLog();
+    renderMoves([]);
+    appendBattleLog(['Creating battle on the Python backend...']);
 }
 
-function bindMovePlaceholders() {
-    const moveButtons = document.querySelectorAll('[data-role="move-btn"]');
+export const renderBattleShell = renderLoadingShell;
 
-    moveButtons.forEach((button, index) => {
-        button.addEventListener('click', async () => {
-            // TODO: Implement move handling.
-            //
-            // Expected flow:
-            // 1. Read selected move from battle state
-            // 2. Send move to backend or WebSocket
-            // 3. Receive updated battle state
-            // 4. Call renderBattleState(updatedState)
-            //
-            // Do NOT add automatic enemy turns here. That checkpoint comes later.
-            await sendMove(null, `move-${index + 1}`);
-        });
-    });
-}
+export function renderBattleState(nextState) {
+    if (!nextState || !nextState.player || !nextState.enemy) return;
 
-export function renderBattleState(battleState) {
-    // TODO: Complete this renderer after the backend returns battle state.
-    //
-    // Expected input:
-    // {
-    //   player: { name, sprite, currentHp, maxHp, moves },
-    //   enemy: { name, sprite, currentHp, maxHp },
-    //   log: string[],
-    //   winner: null | 'player' | 'enemy'
-    // }
-    //
-    // Expected output:
-    // The DOM updates without reloading the page.
-    console.info('[starter] renderBattleState TODO:', battleState);
-}
+    battleState = nextState;
+    localStorage.setItem('battleState', JSON.stringify(battleState));
 
-function renderMovePlaceholders() {
-    const moveButtons = document.querySelectorAll('[data-role="move-btn"]');
+    setText('[data-role="player-name"]', battleState.player.name);
+    setText('[data-role="enemy-name"]', battleState.enemy.name);
+    setImage('[data-role="player-sprite"]', battleState.player.sprite || PLAYER_PLACEHOLDER);
+    setImage('[data-role="enemy-sprite"]', battleState.enemy.sprite || ENEMY_PLACEHOLDER);
+    setHpBar(
+        'player',
+        hpPercent(battleState.player),
+        `${battleState.player.currentHp} / ${battleState.player.maxHp}`,
+    );
+    setHpBar(
+        'enemy',
+        hpPercent(battleState.enemy),
+        `${battleState.enemy.currentHp} / ${battleState.enemy.maxHp}`,
+    );
+    renderMoves(battleState.player.moves || []);
+    appendBattleLog(battleState.log || []);
+    setPlayerControlsEnabled(battleState.turn === 'player' && !battleState.winner);
 
-    moveButtons.forEach((button, index) => {
-        setTextIn(button, '[data-role="move-name"]', `Move ${index + 1}`);
-        setTextIn(button, '[data-role="move-type"]', 'TODO');
-        setTextIn(button, '[data-role="move-pp"]', '--/--');
-        button.disabled = false;
-        button.title = 'TODO: wire this move button to battle logic';
-    });
-}
-
-function clearBattleLog() {
-    const logEl = document.querySelector('[data-role="battle-log"]');
-    if (logEl) {
-        // TODO: Append battle log entries as actions resolve.
-        //
-        // Expected input:
-        // string[] of recent battle events
-        logEl.innerHTML = '';
+    const outcome = determineBattleOutcome(battleState);
+    if (outcome) {
+        saveOverlayState(outcome);
+        cleanupSocket?.();
+        setTimeout(() => routeToOverlay(outcome), 900);
+        return;
     }
+
+    maybeRunEnemyTurn();
+}
+
+function renderMoves(moves) {
+    const moveButtons = document.querySelectorAll('[data-role="move-btn"]');
+
+    moveButtons.forEach((button, index) => {
+        const move = moves[index];
+        button.dataset.moveId = move?.id || '';
+        setTextIn(button, '[data-role="move-name"]', move?.name || `Move ${index + 1}`);
+        setTextIn(button, '[data-role="move-type"]', move?.type?.toUpperCase() || '-');
+        setTextIn(button, '[data-role="move-pp"]', move ? `${move.pp} PP` : '-');
+        button.disabled = !move;
+        button.onclick = async () => {
+            if (!battleState || battleState.turn !== 'player' || battleState.winner || !move) return;
+            setPlayerControlsEnabled(false);
+            const updatedState = await sendMove(battleState.battleId, move.id);
+            renderBattleState(updatedState);
+        };
+    });
+}
+
+function maybeRunEnemyTurn() {
+    clearTimeout(enemyTurnTimer);
+
+    if (!battleState || battleState.turn !== 'enemy' || battleState.winner) return;
+
+    enemyTurnTimer = setTimeout(async () => {
+        const move = battleState.enemy.moves?.[0];
+        if (!move) return;
+
+        const updatedState = await sendMove(battleState.battleId, move.id);
+        renderBattleState(updatedState);
+    }, 900);
+}
+
+function setPlayerControlsEnabled(enabled) {
+    document.querySelectorAll('[data-role="move-btn"]').forEach((button) => {
+        button.disabled = !enabled || !button.dataset.moveId;
+        button.classList.toggle('opacity-60', button.disabled);
+        button.classList.toggle('cursor-not-allowed', button.disabled);
+    });
+}
+
+function appendBattleLog(entries) {
+    const logEl = document.querySelector('[data-role="battle-log"]');
+    if (!logEl) return;
+
+    logEl.innerHTML = '';
+    entries.slice(-8).forEach((entry) => {
+        const line = document.createElement('p');
+        line.className = 'text-gray-300 leading-tight';
+        line.textContent = entry;
+        logEl.appendChild(line);
+    });
 }
 
 function setHpBar(role, percent, label) {
@@ -104,16 +143,31 @@ function setHpBar(role, percent, label) {
     const container = document.querySelector(`[data-role="${role}-container"]`);
 
     if (hpBar) {
-        // TODO: Update HP bars dynamically from battle state.
         hpBar.style.width = `${percent}%`;
-        hpBar.classList.remove('bg-green-500', 'bg-yellow-500', 'bg-red-600');
-        hpBar.classList.add('bg-gray-500');
+        hpBar.classList.remove('bg-green-500', 'bg-yellow-500', 'bg-red-600', 'bg-gray-500');
+        hpBar.classList.add(getHpColor(percent));
     }
 
     if (hpText) hpText.textContent = label;
-
-    // Starter call only. Students decide when critical effects should apply.
     applyCriticalEffects(container, percent);
+}
+
+function hpPercent(pokemon) {
+    return Math.max(0, Math.round((pokemon.currentHp / pokemon.maxHp) * 100));
+}
+
+function getHpColor(percent) {
+    if (percent <= 25) return 'bg-red-600';
+    if (percent <= 50) return 'bg-yellow-500';
+    return 'bg-green-500';
+}
+
+function readJson(key) {
+    try {
+        return JSON.parse(localStorage.getItem(key));
+    } catch {
+        return null;
+    }
 }
 
 function setText(selector, value) {

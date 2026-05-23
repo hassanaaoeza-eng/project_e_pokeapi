@@ -2,23 +2,8 @@ export function initOverlay() {
     const titleEl = document.querySelector('[data-role="victory-title"]');
     const spriteEl = document.querySelector('[data-role="winner-sprite"]');
     const continueBtn = document.querySelector('[data-role="continue-btn"]');
-    const overlayState = getOverlayStarterState();
+    const overlayState = getOverlayState();
 
-    // Placeholder overlay state only.
-    // TODO: Inject winner/loser state after victory conditions are implemented.
-    //
-    // Expected input:
-    // {
-    //   result: 'victory' | 'defeat',
-    //   winner: 'player' | 'enemy',
-    //   loser: 'player' | 'enemy',
-    //   featuredPokemon: { name, sprite }
-    // }
-    //
-    // Expected output:
-    // 1. Title changes to VICTORY or DEFEAT
-    // 2. Winner or loser sprite appears depending on result
-    // 3. Continue button clears session and returns to selection
     if (titleEl) {
         titleEl.textContent = overlayState.result === 'defeat' ? 'DEFEAT' : 'VICTORY';
         titleEl.classList.remove('text-red-500', 'text-red-600', 'text-[#fbbf24]');
@@ -26,72 +11,66 @@ export function initOverlay() {
     }
 
     if (spriteEl) {
-        spriteEl.style.backgroundImage = `url('${overlayState.placeholderSprite}')`;
+        spriteEl.style.backgroundImage = `url('${overlayState.featuredPokemon.sprite}')`;
     }
 
     if (continueBtn) {
         continueBtn.addEventListener('click', () => {
-            // TODO: Decide what state should reset after a completed battle.
+            localStorage.removeItem('selectedPlayer');
+            localStorage.removeItem('selectedEnemy');
+            localStorage.removeItem('battleState');
+            localStorage.removeItem('overlayState');
             window.location.href = 'index.html';
         });
     }
 }
 
 export function determineBattleOutcome(battleState) {
-    // TODO:
-    // Determine winner after HP reaches 0.
-    //
-    // Input:
-    // battleState with player.currentHp and enemy.currentHp
-    //
-    // Expected output:
-    // {
-    //   result: 'victory' | 'defeat',
-    //   winner: 'player' | 'enemy',
-    //   loser: 'player' | 'enemy'
-    // }
-    //
-    // Hint:
-    // This helper should not route pages directly. Return data first.
-    console.info('[starter] determineBattleOutcome TODO:', battleState);
-    return null;
+    if (!battleState?.winner) return null;
+
+    const playerWon = battleState.winner === 'player';
+    const featuredPokemon = playerWon ? battleState.player : battleState.enemy;
+
+    return {
+        result: playerWon ? 'victory' : 'defeat',
+        winner: battleState.winner,
+        loser: playerWon ? 'enemy' : 'player',
+        featuredPokemon,
+    };
 }
 
 export function saveOverlayState(outcome) {
-    // TODO:
-    // Save winner state and loser state for the overlay page.
-    //
-    // Input:
-    // outcome from determineBattleOutcome()
-    //
-    // Expected behavior:
-    // Store only the minimum information needed by victory.html / defeat.html.
-    console.info('[starter] saveOverlayState TODO:', outcome);
+    localStorage.setItem('overlayState', JSON.stringify(outcome));
 }
 
 export function routeToOverlay(outcome) {
-    // TODO:
-    // Route to overlay screen after battle completion.
-    //
-    // Expected behavior:
-    // 1. If player wins, route to victory.html
-    // 2. If player loses, route to defeat.html or victory.html?result=defeat
-    // 3. Keep routing separate from damage calculation
-    console.info('[starter] routeToOverlay TODO:', outcome);
+    window.location.href = outcome.result === 'defeat' ? 'defeat.html' : 'victory.html';
 }
 
-function getOverlayStarterState() {
+function getOverlayState() {
+    const stored = readJson('overlayState');
+    if (stored?.featuredPokemon) return stored;
+
     const route = window.location.pathname.split('/').pop();
-    const params = new URLSearchParams(window.location.search);
-    const requestedResult = params.get('result');
-    const result = requestedResult === 'defeat' || route === 'defeat.html' ? 'defeat' : 'victory';
+    const result = route === 'defeat.html' ? 'defeat' : 'victory';
 
     return {
         result,
         winner: null,
         loser: null,
-        placeholderSprite: result === 'defeat'
-            ? 'assets/placeholders/enemy-placeholder.svg'
-            : 'assets/placeholders/fighter-placeholder.svg',
+        featuredPokemon: {
+            name: result === 'defeat' ? 'Enemy' : 'Player',
+            sprite: result === 'defeat'
+                ? 'assets/placeholders/enemy-placeholder.svg'
+                : 'assets/placeholders/fighter-placeholder.svg',
+        },
     };
+}
+
+function readJson(key) {
+    try {
+        return JSON.parse(localStorage.getItem(key));
+    } catch {
+        return null;
+    }
 }

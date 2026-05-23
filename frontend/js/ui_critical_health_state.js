@@ -1,22 +1,8 @@
 export function applyCriticalEffects(rootEl, hpPercent) {
-    // Starter visual hook only.
-    //
-    // TODO: Trigger critical health effects when HP is low.
-    //
-    // Expected input:
-    // rootEl: DOM container for player or enemy
-    // hpPercent: number from 0 to 100
-    //
-    // Expected behavior:
-    // 1. Add a warning class when hpPercent is below your threshold
-    // 2. Remove the class when HP recovers or battle resets
-    // 3. Keep this visual concern separate from damage calculation
     if (!rootEl) return;
 
     installCriticalStarterStyles();
-    rootEl.classList.remove('critical-health-fx');
-
-    console.info('[starter] critical health TODO:', { rootEl, hpPercent });
+    rootEl.classList.toggle('critical-health-fx', hpPercent > 0 && hpPercent <= 25);
 }
 
 function installCriticalStarterStyles() {

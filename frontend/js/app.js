@@ -5,8 +5,6 @@ import { initOverlay } from './ui_overlay.js';
 document.addEventListener('DOMContentLoaded', () => {
     const route = window.location.pathname.split('/').pop() || 'index.html';
 
-    // Starter router only:
-    // TODO: If this project grows, replace this with a small page controller map.
     if (route === 'battle.html') {
         initBattle();
         return;
