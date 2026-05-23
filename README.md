@@ -1,10 +1,33 @@
-Project E PokeSim Battle Engine
+Project E PokeBattle Arena
 
-RUN frontend locally using the following steps
+This repo contains a frontend starter UI and a Python backend starter server for
+the guided battle-system project.
+
+Backend:
+
+cd backend
+pip install -r requirements.txt
+uvicorn main:app --reload --host 0.0.0.0 --port 8000
+
+If pip tries to compile pydantic-core and complains about link.exe, upgrade pip
+and reinstall:
+
+python -m pip install --upgrade pip
+pip install -r requirements.txt
+
+Frontend:
 
 cd frontend
 python -m http.server 5173
 
-On a browser:
+Open:
 
 http://localhost:5173/index.html
+
+Useful backend routes:
+
+GET http://localhost:8000/health
+GET http://localhost:8000/api/pokemon
+POST http://localhost:8000/api/battles
+POST http://localhost:8000/api/battles/{battleId}/moves
+WS ws://localhost:8000/ws
