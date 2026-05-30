@@ -47,10 +47,10 @@ export async function createBattle(playerPokemon, enemyPokemon) {
     });
 }
 
-export async function sendMove(battleId, moveId) {
+export async function sendMove(battleId, actor, moveId) {
     return request(`/api/battles/${battleId}/moves`, {
         method: 'POST',
-        body: JSON.stringify({ moveId }),
+        body: JSON.stringify({ actor, moveId }),
     });
 }
 

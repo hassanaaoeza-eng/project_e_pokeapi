@@ -1,7 +1,8 @@
 Project E PokeBattle Arena
 
-This repo contains a frontend starter UI and a Python backend starter server for
-the guided battle-system project.
+This repo contains a provided frontend client and a Python backend starter server
+for the guided battle-system project. Students complete the Python backend logic;
+the frontend is included so they can test their work in the browser.
 
 Backend:
 
@@ -31,3 +32,10 @@ GET http://localhost:8000/api/pokemon
 POST http://localhost:8000/api/battles
 POST http://localhost:8000/api/battles/{battleId}/moves
 WS ws://localhost:8000/ws
+
+Move request body:
+
+{
+  "actor": "player",
+  "moveId": "thunder-shock"
+}

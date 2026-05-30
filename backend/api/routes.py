@@ -57,17 +57,32 @@ async def send_move(battle_id: str, payload: MoveRequest):
     if battle is None:
         raise HTTPException(status_code=404, detail="Battle not found.")
 
-    state = battle.apply_move(payload.moveId)
+    state = battle.apply_move(payload.moveId, actor=payload.actor)
     await connection_manager.broadcast(battle_id, state)
     return state
 
 
+async def process_socket_move(battle_id: str, message: dict, websocket: WebSocket) -> None:
+    battle = battle_store.get(battle_id)
+    if battle is None:
+        await websocket.send_json({"error": "Battle not found."})
+        return
+
+    actor = message.get("actor")
+    move_id = message.get("moveId")
+
+    if actor not in {"player", "enemy"} or not move_id:
+        await websocket.send_json(
+            {"error": "Send {'actor': 'player' | 'enemy', 'moveId': '<id>'}."}
+        )
+        return
+
+    state = battle.apply_move(move_id, actor=actor)
+    await connection_manager.broadcast(battle_id, state)
+
+
 @router.websocket("/ws/{battle_id}")
 async def battle_socket(websocket: WebSocket, battle_id: str):
-    # Starter WebSocket:
-    # The frontend can subscribe to a battle room and receive broadcasts after
-    # REST move submissions. Students can later send attack events through this
-    # same socket instead of POST /api/battles/{battle_id}/moves.
     await connection_manager.connect(battle_id, websocket)
     battle = battle_store.get(battle_id)
     if battle is not None:
@@ -75,13 +90,8 @@ async def battle_socket(websocket: WebSocket, battle_id: str):
 
     try:
         while True:
-            await websocket.receive_json()
-            await websocket.send_json(
-                {
-                    "event": "todo",
-                    "message": "Send move events through this socket in the multiplayer checkpoint.",
-                }
-            )
+            message = await websocket.receive_json()
+            await process_socket_move(battle_id, message, websocket)
     except WebSocketDisconnect:
         connection_manager.disconnect(battle_id, websocket)
 
@@ -111,13 +121,8 @@ async def battle_socket_with_subscription(websocket: WebSocket):
             await websocket.send_json(battle.to_dict())
 
         while True:
-            await websocket.receive_json()
-            await websocket.send_json(
-                {
-                    "event": "todo",
-                    "message": "Route move events through this socket in the multiplayer checkpoint.",
-                }
-            )
+            message = await websocket.receive_json()
+            await process_socket_move(battle_id, message, websocket)
     except WebSocketDisconnect:
         if battle_id is not None:
             connection_manager.disconnect(battle_id, websocket)

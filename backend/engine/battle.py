@@ -43,9 +43,13 @@ class Battle:
         )
         return battle
 
-    def apply_move(self, move_id: str) -> dict:
+    def apply_move(self, move_id: str, actor: str | None = None) -> dict:
         if self.winner:
             self.log.append("Battle is already over.")
+            return self.to_dict()
+
+        if actor is not None and actor != self.turn:
+            self.log.append(f"Rejected move: it is {self.turn}'s turn.")
             return self.to_dict()
 
         attacker = self.player if self.turn == "player" else self.enemy

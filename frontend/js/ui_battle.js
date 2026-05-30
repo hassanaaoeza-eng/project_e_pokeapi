@@ -96,7 +96,7 @@ function renderMoves(moves) {
         button.onclick = async () => {
             if (!battleState || battleState.turn !== 'player' || battleState.winner || !move) return;
             setPlayerControlsEnabled(false);
-            const updatedState = await sendMove(battleState.battleId, move.id);
+            const updatedState = await sendMove(battleState.battleId, 'player', move.id);
             renderBattleState(updatedState);
         };
     });
@@ -111,7 +111,7 @@ function maybeRunEnemyTurn() {
         const move = battleState.enemy.moves?.[0];
         if (!move) return;
 
-        const updatedState = await sendMove(battleState.battleId, move.id);
+        const updatedState = await sendMove(battleState.battleId, 'enemy', move.id);
         renderBattleState(updatedState);
     }, 900);
 }

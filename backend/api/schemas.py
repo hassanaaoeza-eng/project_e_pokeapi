@@ -48,6 +48,7 @@ class BattleCreateRequest(BaseModel):
 
 
 class MoveRequest(BaseModel):
+    actor: TurnOwner
     moveId: str
 
 
