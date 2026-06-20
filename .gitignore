@@ -35,3 +35,8 @@ Thumbs.db
 # --------------------
 *.log
 logs/
+
+# --------------------
+# Teacher-only materials
+# --------------------
+MODEL_ANSWERS_AND_EXERCISE_AUDIT.md

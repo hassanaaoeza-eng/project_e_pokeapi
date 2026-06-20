@@ -8,6 +8,7 @@ from api.schemas import (
     MoveRequest,
     PokemonRead,
 )
+from api.learning_docs import pokeapi_docs_payload
 from api.state import battle_store, connection_manager
 from engine.battle import Battle
 from engine.pokeapi_client import fetch_roster, get_pokemon_by_id
@@ -25,6 +26,11 @@ async def health_check():
 async def list_pokemon():
     roster = await fetch_roster()
     return [pokemon.to_roster_dict() for pokemon in roster]
+
+
+@router.get("/api/pokeapi-docs")
+async def pokeapi_docs():
+    return pokeapi_docs_payload()
 
 
 @router.post("/api/battles", response_model=BattleStateRead)

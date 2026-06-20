@@ -16,6 +16,12 @@ class BattlePokemon:
 
     @classmethod
     def from_pokemon(cls, pokemon: Pokemon) -> "BattlePokemon":
+        # Challenge 1:
+        # Create a battle-ready Pokemon object.
+        #
+        # Requirement:
+        # - Store the original Pokemon object.
+        # - Initialize current_hp from pokemon.hp.
         return cls(pokemon=pokemon, current_hp=pokemon.hp)
 
     def to_dict(self) -> dict:
@@ -33,55 +39,46 @@ class Battle:
 
     @classmethod
     def create(cls, player: Pokemon, enemy: Pokemon) -> "Battle":
-        battle = cls(
-            player=BattlePokemon.from_pokemon(player),
-            enemy=BattlePokemon.from_pokemon(enemy),
-            turn="player" if player.speed >= enemy.speed else "enemy",
-        )
-        battle.log.append(
-            f"Battle started: {player.name} vs {enemy.name}. {battle.turn.title()} moves first."
-        )
-        return battle
+        # Challenges 1 and 3:
+        # Create the initial backend-owned battle state.
+        #
+        # Requirements:
+        # - Create player and enemy BattlePokemon objects.
+        # - Initialize HP through BattlePokemon.from_pokemon().
+        # - Decide the first turn using speed.
+        # - Add a useful opening log message.
+        # - Return the Battle object.
+        raise NotImplementedError("Complete Challenge 1 and Challenge 3 in Battle.create().")
 
     def apply_move(self, move_id: str, actor: str | None = None) -> dict:
-        if self.winner:
-            self.log.append("Battle is already over.")
-            return self.to_dict()
-
-        if actor is not None and actor != self.turn:
-            self.log.append(f"Rejected move: it is {self.turn}'s turn.")
-            return self.to_dict()
-
-        attacker = self.player if self.turn == "player" else self.enemy
-        defender = self.enemy if self.turn == "player" else self.player
-        move = self._find_move(attacker.pokemon.moves, move_id)
-
-        if move is None:
-            self.log.append(f"{attacker.pokemon.name} tried an invalid move.")
-            return self.to_dict()
-
-        damage = calculate_damage(attacker.pokemon, defender.pokemon, move)
-        defender.current_hp = max(0, defender.current_hp - damage)
-        self.log.append(f"{attacker.pokemon.name} used {move.name}.")
-        self.log.append(f"{defender.pokemon.name} lost {damage} HP.")
-
-        if defender.current_hp == 0:
-            self.winner = self.turn
-            self.log.append(victory_message(attacker.pokemon.name))
-            return self.to_dict()
-
-        self.turn = "enemy" if self.turn == "player" else "player"
-        return self.to_dict()
+        # Challenges 8, 9, 10, and 11:
+        # Process one move on the Python backend.
+        #
+        # Requirements:
+        # - Reject moves after the battle already has a winner.
+        # - Reject moves from the wrong actor.
+        # - Select attacker and defender from self.turn.
+        # - Find the selected move by move_id.
+        # - Calculate damage with calculate_damage().
+        # - Reduce defender.current_hp without going below 0.
+        # - Append battle log messages.
+        # - Set winner when a Pokemon reaches 0 HP.
+        # - Switch turn after a valid non-winning move.
+        # - Return self.to_dict().
+        raise NotImplementedError("Complete the move-processing challenges in Battle.apply_move().")
 
     def to_dict(self) -> dict:
-        return {
-            "battleId": self.battle_id,
-            "player": self.player.to_dict(),
-            "enemy": self.enemy.to_dict(),
-            "turn": self.turn,
-            "log": self.log[-8:],
-            "winner": self.winner,
-        }
+        # Challenge 2:
+        # Return the exact battle state shape expected by the provided frontend.
+        #
+        # Required keys:
+        # - battleId
+        # - player
+        # - enemy
+        # - turn
+        # - log
+        # - winner
+        raise NotImplementedError("Complete Challenge 2 in Battle.to_dict().")
 
     @staticmethod
     def _find_move(moves: list[Move], move_id: str) -> Move | None:
@@ -89,7 +86,11 @@ class Battle:
 
 
 def calculate_damage(attacker: Pokemon, defender: Pokemon, move: Move) -> int:
-    # TODO: Let students evolve this formula with randomness, critical hits,
-    # status effects, and a richer type chart.
-    base_damage = max(1, move.power + attacker.attack // 4 - defender.defense // 5)
-    return max(1, round(base_damage * effectiveness(move.type, defender.type)))
+    # Challenge 9:
+    # Build the backend damage formula.
+    #
+    # Requirements:
+    # - Use move.power, attacker.attack, defender.defense, and type effectiveness.
+    # - Always return at least 1 damage.
+    # - Return an integer.
+    raise NotImplementedError("Complete Challenge 9 in calculate_damage().")

@@ -4,6 +4,14 @@ This repo contains a provided frontend client and a Python backend starter serve
 for the guided battle-system project. Students complete the Python backend logic;
 the frontend is included so they can test their work in the browser.
 
+Student tasks are listed in:
+
+STUDENT_TASKS.md
+
+Note: the backend intentionally contains unfinished challenge blocks. The health
+and roster routes should work first; battle creation and move processing will
+start working as students complete `backend/engine/battle.py`.
+
 Backend:
 
 cd backend
