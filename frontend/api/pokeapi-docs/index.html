@@ -1,0 +1,441 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Project E PokeAPI Student Docs</title>
+    <style>
+        :root {
+            color-scheme: dark;
+            --bg: #10151f;
+            --panel: #161f2d;
+            --panel-2: #1d2938;
+            --text: #eef5ff;
+            --muted: #aebbd0;
+            --cyan: #37e8ff;
+            --yellow: #ffd166;
+            --green: #52e0a3;
+            --magenta: #ff6bd6;
+            --line: rgba(255, 255, 255, 0.13);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--text);
+            font-family: Arial, Helvetica, sans-serif;
+            line-height: 1.5;
+        }
+
+        main {
+            max-width: 1080px;
+            margin: 0 auto;
+            padding: 32px 20px 56px;
+        }
+
+        h1,
+        h2,
+        h3 {
+            line-height: 1.15;
+            margin: 0;
+        }
+
+        h1 {
+            font-size: 36px;
+            margin-bottom: 12px;
+        }
+
+        h2 {
+            color: var(--cyan);
+            font-size: 24px;
+            margin-bottom: 14px;
+        }
+
+        h3 {
+            color: var(--yellow);
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+
+        p {
+            color: var(--muted);
+            margin: 0 0 14px;
+        }
+
+        section {
+            border-top: 1px solid var(--line);
+            padding-top: 28px;
+            margin-top: 28px;
+        }
+
+        .hero,
+        .card {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 22px;
+        }
+
+        .hero {
+            border-color: rgba(55, 232, 255, 0.35);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 14px;
+        }
+
+        .challenge {
+            background: var(--panel-2);
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 16px;
+        }
+
+        code,
+        pre {
+            background: #08101b;
+            color: #d8f7ff;
+            border: 1px solid rgba(55, 232, 255, 0.22);
+            border-radius: 6px;
+            font-family: Consolas, "Courier New", monospace;
+        }
+
+        code {
+            padding: 2px 5px;
+        }
+
+        pre {
+            overflow: auto;
+            padding: 12px;
+            margin: 10px 0 0;
+            white-space: pre-wrap;
+        }
+
+        ul,
+        ol {
+            margin: 8px 0 0;
+            padding-left: 22px;
+            color: var(--text);
+        }
+
+        li + li {
+            margin-top: 4px;
+        }
+
+        .tag {
+            display: inline-block;
+            color: #07111d;
+            background: var(--yellow);
+            border-radius: 999px;
+            padding: 3px 9px;
+            font-size: 12px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .ok {
+            color: var(--green);
+        }
+
+        .warn {
+            color: var(--yellow);
+        }
+
+        a {
+            color: var(--cyan);
+        }
+    </style>
+</head>
+<body>
+<main>
+    <div class="hero">
+        <span class="tag">Project E Docs</span>
+        <h1>PokeAPI Student Docs</h1>
+        <p>
+            Use this page before coding. It shows the real API path, the fields the game needs,
+            the helper students should call, and the backend response shapes the frontend expects.
+        </p>
+        <p class="warn">
+            This page is served by the frontend dev server on port 5173. The game backend still runs on port 8000.
+        </p>
+    </div>
+
+    <section>
+        <h2>Ports</h2>
+        <div class="grid">
+            <div class="card">
+                <h3>Frontend</h3>
+                <pre>http://localhost:5173/index.html</pre>
+            </div>
+            <div class="card">
+                <h3>This Docs Page</h3>
+                <pre>http://localhost:5173/api/pokeapi-docs/</pre>
+            </div>
+            <div class="card">
+                <h3>Backend API</h3>
+                <pre>http://localhost:8000</pre>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Student Workflow</h2>
+        <ol>
+            <li>Open this docs page.</li>
+            <li>Open one real PokeAPI example in the browser.</li>
+            <li>Complete one small TODO method at a time.</li>
+            <li>Refresh <code>http://localhost:8000/api/pokemon</code> to check the roster.</li>
+            <li>Use the frontend on port 5173 to test the game flow.</li>
+        </ol>
+    </section>
+
+    <section>
+        <h2>Real PokeAPI</h2>
+        <div class="card">
+            <h3>Base URL</h3>
+            <pre>https://pokeapi.co/api/v2</pre>
+            <h3>Pokemon path pattern</h3>
+            <pre>/pokemon/{pokemon_id}</pre>
+            <h3>Try these in the browser</h3>
+            <ul>
+                <li><a href="https://pokeapi.co/api/v2/pokemon/pikachu">https://pokeapi.co/api/v2/pokemon/pikachu</a></li>
+                <li><a href="https://pokeapi.co/api/v2/pokemon/charmeleon">https://pokeapi.co/api/v2/pokemon/charmeleon</a></li>
+                <li><a href="https://pokeapi.co/api/v2/pokemon/bulbasaur">https://pokeapi.co/api/v2/pokemon/bulbasaur</a></li>
+                <li><a href="https://pokeapi.co/api/v2/pokemon/squirtle">https://pokeapi.co/api/v2/pokemon/squirtle</a></li>
+            </ul>
+        </div>
+    </section>
+
+    <section>
+        <h2>Fields To Extract</h2>
+        <div class="grid">
+            <div class="card">
+                <h3>id</h3>
+                <pre>data["name"]</pre>
+            </div>
+            <div class="card">
+                <h3>display name</h3>
+                <pre>data["name"].title()</pre>
+            </div>
+            <div class="card">
+                <h3>first type</h3>
+                <pre>data["types"][0]["type"]["name"]</pre>
+            </div>
+            <div class="card">
+                <h3>sprite</h3>
+                <pre>data["sprites"]["front_default"]</pre>
+            </div>
+            <div class="card">
+                <h3>stats</h3>
+                <pre>self._stats_by_name(data)</pre>
+                <p>Use the keys <code>hp</code>, <code>attack</code>, <code>defense</code>, and <code>speed</code>.</p>
+            </div>
+            <div class="card">
+                <h3>moves</h3>
+                <pre>STARTER_MOVE_IDS
+MOVE_LIBRARY</pre>
+                <p>Do not parse PokeAPI move data for this lesson.</p>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Provided Boilerplate</h2>
+        <div class="card">
+            <h3>File</h3>
+            <pre>backend/engine/pokeapi_client.py</pre>
+            <h3>Helper</h3>
+            <pre>self._get_json(path)</pre>
+            <p>This helper adds the base PokeAPI URL, makes the HTTP request, checks for HTTP errors, and returns a Python dictionary.</p>
+            <p class="ok">Students only choose the path and pass the result forward.</p>
+        </div>
+    </section>
+
+    <section>
+        <h2>Challenge Map</h2>
+        <div class="grid">
+            <div class="challenge">
+                <h3>1. Fetch One Pokemon</h3>
+                <p><code>PokeApiClient.fetch_pokemon()</code></p>
+                <ul>
+                    <li>build <code>/pokemon/{pokemon_id}</code></li>
+                    <li>call <code>self._get_json(path)</code></li>
+                    <li>return <code>self.build_pokemon(data)</code></li>
+                </ul>
+            </div>
+            <div class="challenge">
+                <h3>2. Build One Pokemon Object</h3>
+                <p><code>PokeApiClient.build_pokemon()</code></p>
+                <ul>
+                    <li>read name, type, sprite, and stats</li>
+                    <li>call <code>self.build_moves(pokemon_id)</code></li>
+                    <li>return <code>Pokemon(...)</code></li>
+                </ul>
+            </div>
+            <div class="challenge">
+                <h3>3. Build Moves</h3>
+                <p><code>PokeApiClient.build_moves()</code></p>
+                <ul>
+                    <li>read <code>STARTER_MOVE_IDS</code></li>
+                    <li>look up each id in <code>MOVE_LIBRARY</code></li>
+                    <li>use a list comprehension</li>
+                </ul>
+            </div>
+            <div class="challenge">
+                <h3>4. Build The Roster</h3>
+                <p><code>PokeApiClient.fetch_roster()</code></p>
+                <ul>
+                    <li>loop through <code>ROSTER_IDS</code></li>
+                    <li>call <code>self.fetch_pokemon(...)</code></li>
+                    <li>use a list comprehension</li>
+                </ul>
+            </div>
+            <div class="challenge">
+                <h3>5. Create Battle Pokemon</h3>
+                <p><code>BattlePokemon.from_pokemon()</code></p>
+                <ul>
+                    <li>store the original Pokemon</li>
+                    <li>start current HP at full HP</li>
+                    <li>return <code>BattlePokemon</code></li>
+                </ul>
+            </div>
+            <div class="challenge">
+                <h3>6. Create Battle State</h3>
+                <p><code>Battle.create()</code></p>
+                <ul>
+                    <li>create player and enemy battle objects</li>
+                    <li>use speed to choose first turn</li>
+                    <li>return a <code>Battle</code></li>
+                </ul>
+            </div>
+            <div class="challenge">
+                <h3>7. Return Battle State</h3>
+                <p><code>Battle.to_dict()</code></p>
+                <ul>
+                    <li>return <code>battleId</code>, <code>player</code>, <code>enemy</code></li>
+                    <li>return <code>turn</code>, <code>log</code>, <code>winner</code></li>
+                </ul>
+            </div>
+            <div class="challenge">
+                <h3>8. Process One Move</h3>
+                <p><code>Battle.apply_move()</code></p>
+                <ul>
+                    <li>check whose turn it is</li>
+                    <li>find the selected move</li>
+                    <li>lower HP and switch turns</li>
+                </ul>
+            </div>
+            <div class="challenge">
+                <h3>9. Build Damage</h3>
+                <p><code>calculate_damage()</code></p>
+                <ul>
+                    <li>use move power</li>
+                    <li>use attack and defense</li>
+                    <li>use type effectiveness</li>
+                    <li>return at least 1 damage</li>
+                </ul>
+            </div>
+            <div class="challenge">
+                <h3>10. Detect The Winner</h3>
+                <p><code>Battle.apply_move()</code></p>
+                <ul>
+                    <li>check for 0 HP</li>
+                    <li>set winner</li>
+                    <li>block future moves after the battle ends</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Game API Checks</h2>
+        <div class="grid">
+            <div class="card">
+                <h3>Health</h3>
+                <pre>GET http://localhost:8000/health</pre>
+            </div>
+            <div class="card">
+                <h3>Roster</h3>
+                <pre>GET http://localhost:8000/api/pokemon</pre>
+            </div>
+            <div class="card">
+                <h3>Create Battle</h3>
+                <pre>POST http://localhost:8000/api/battles
+
+{
+  "playerPokemonId": "pikachu",
+  "enemyPokemonId": "bulbasaur"
+}</pre>
+            </div>
+            <div class="card">
+                <h3>Send Move</h3>
+                <pre>POST http://localhost:8000/api/battles/{battleId}/moves
+
+{
+  "actor": "player",
+  "moveId": "thunder-shock"
+}</pre>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Response Shapes</h2>
+        <div class="grid">
+            <div class="card">
+                <h3>MoveRead</h3>
+                <pre>{
+  "id": "string",
+  "name": "string",
+  "type": "string",
+  "power": 28,
+  "pp": 30
+}</pre>
+            </div>
+            <div class="card">
+                <h3>PokemonRead</h3>
+                <pre>{
+  "id": "pikachu",
+  "name": "Pikachu",
+  "type": "electric",
+  "sprite": "image URL",
+  "hp": 90,
+  "attack": 55,
+  "defense": 40,
+  "speed": 90,
+  "moves": [...]
+}</pre>
+            </div>
+            <div class="card">
+                <h3>BattleStateRead</h3>
+                <pre>{
+  "battleId": "string",
+  "player": {...},
+  "enemy": {...},
+  "turn": "player",
+  "log": [],
+  "winner": null
+}</pre>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Common Mistakes</h2>
+        <ul>
+            <li>Trying to edit frontend JavaScript for a Python backend challenge.</li>
+            <li>Opening backend API routes on port 5173 instead of port 8000.</li>
+            <li>Parsing all PokeAPI moves instead of using <code>STARTER_MOVE_IDS</code> and <code>MOVE_LIBRARY</code>.</li>
+            <li>Returning raw PokeAPI dictionaries instead of <code>Pokemon</code> objects.</li>
+            <li>Using the whole types list when this beginner project only needs the first type.</li>
+        </ul>
+    </section>
+</main>
+</body>
+</html>
