@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import requests
 
 from engine.move import Move
@@ -11,7 +9,7 @@ SPRITE_BASE = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/
 
 ROSTER_IDS = ["charmeleon", "pikachu", "bulbasaur", "squirtle"]
 
-MOVE_LIBRARY: dict[str, Move] = {
+MOVE_LIBRARY = {
     "ember": Move("ember", "Ember", "fire", 24, 25),
     "scratch": Move("scratch", "Scratch", "normal", 18, 35),
     "flame-burst": Move("flame-burst", "Flame Burst", "fire", 32, 15),
@@ -28,7 +26,7 @@ MOVE_LIBRARY: dict[str, Move] = {
     "withdraw": Move("withdraw", "Withdraw", "normal", 10, 40),
 }
 
-STARTER_MOVE_IDS: dict[str, list[str]] = {
+STARTER_MOVE_IDS = {
     "charmeleon": ["ember", "scratch", "flame-burst", "quick-attack"],
     "pikachu": ["thunder-shock", "quick-attack", "electro-ball", "tail-whip"],
     "bulbasaur": ["vine-whip", "tackle", "razor-leaf", "growl"],
@@ -36,50 +34,70 @@ STARTER_MOVE_IDS: dict[str, list[str]] = {
 }
 
 
-STARTER_ROSTER: list[Pokemon] = [
+STARTER_ROSTER = [
     Pokemon(
         id="charmeleon",
         name="Charmeleon",
         type="fire",
-        sprite=f"{SPRITE_BASE}/5.png",
+        sprite=SPRITE_BASE + "/5.png",
         hp=100,
         attack=64,
         defense=58,
         speed=80,
-        moves=[MOVE_LIBRARY[move_id] for move_id in STARTER_MOVE_IDS["charmeleon"]],
+        moves=[
+            MOVE_LIBRARY["ember"],
+            MOVE_LIBRARY["scratch"],
+            MOVE_LIBRARY["flame-burst"],
+            MOVE_LIBRARY["quick-attack"],
+        ],
     ),
     Pokemon(
         id="pikachu",
         name="Pikachu",
         type="electric",
-        sprite=f"{SPRITE_BASE}/25.png",
+        sprite=SPRITE_BASE + "/25.png",
         hp=90,
         attack=55,
         defense=40,
         speed=90,
-        moves=[MOVE_LIBRARY[move_id] for move_id in STARTER_MOVE_IDS["pikachu"]],
+        moves=[
+            MOVE_LIBRARY["thunder-shock"],
+            MOVE_LIBRARY["quick-attack"],
+            MOVE_LIBRARY["electro-ball"],
+            MOVE_LIBRARY["tail-whip"],
+        ],
     ),
     Pokemon(
         id="bulbasaur",
         name="Bulbasaur",
         type="grass",
-        sprite=f"{SPRITE_BASE}/1.png",
+        sprite=SPRITE_BASE + "/1.png",
         hp=100,
         attack=49,
         defense=49,
         speed=45,
-        moves=[MOVE_LIBRARY[move_id] for move_id in STARTER_MOVE_IDS["bulbasaur"]],
+        moves=[
+            MOVE_LIBRARY["vine-whip"],
+            MOVE_LIBRARY["tackle"],
+            MOVE_LIBRARY["razor-leaf"],
+            MOVE_LIBRARY["growl"],
+        ],
     ),
     Pokemon(
         id="squirtle",
         name="Squirtle",
         type="water",
-        sprite=f"{SPRITE_BASE}/7.png",
+        sprite=SPRITE_BASE + "/7.png",
         hp=100,
         attack=48,
         defense=65,
         speed=43,
-        moves=[MOVE_LIBRARY[move_id] for move_id in STARTER_MOVE_IDS["squirtle"]],
+        moves=[
+            MOVE_LIBRARY["water-gun"],
+            MOVE_LIBRARY["tackle"],
+            MOVE_LIBRARY["bubble"],
+            MOVE_LIBRARY["withdraw"],
+        ],
     ),
 ]
 
@@ -87,48 +105,48 @@ STARTER_ROSTER: list[Pokemon] = [
 class PokeApiClient:
     """Small lesson-friendly wrapper around PokeAPI."""
 
-    def __init__(self, base_url: str = POKEAPI_BASE_URL) -> None:
+    def __init__(self, base_url=POKEAPI_BASE_URL):
         self.base_url = base_url.rstrip("/")
 
-    def fetch_roster(self) -> list[Pokemon]:
-        # TODO: Build the full roster from ROSTER_IDS.
-        # Hint: a list comprehension can call self.fetch_pokemon(...) for each id.
-        raise NotImplementedError("Complete PokeAPI Challenge 4.")
+    def fetch_roster(self):
+        # TODO: Challenge 5 - Build the full roster from ROSTER_IDS.
+        # Hint: loop through ROSTER_IDS and call self.fetch_pokemon(...) for each id.
+        raise NotImplementedError("Complete Challenge 5 in fetch_roster().")
 
-    def fetch_pokemon(self, pokemon_id: str) -> Pokemon:
-        # TODO: Call the PokeAPI pokemon endpoint for one pokemon.
-        # Hint: the path should include /pokemon/ and the pokemon_id.
+    def fetch_pokemon(self, pokemon_id):
+        # TODO: Challenge 1 - Call the PokeAPI pokemon endpoint for one pokemon.
+        # Hint: build the full URL using self.base_url, /pokemon/, and pokemon_id.
+        # Hint: use requests.get(url, timeout=10).
+        # Hint: call response.raise_for_status(), then response.json().
         # Hint: pass the response dictionary into self.build_pokemon(...).
-        raise NotImplementedError("Complete PokeAPI Challenge 1.")
+        raise NotImplementedError("Complete Challenge 1 in fetch_pokemon().")
 
-    def build_pokemon(self, data: dict) -> Pokemon:
-        # TODO: Convert PokeAPI's dictionary into our Pokemon class.
+    def build_pokemon(self, data):
+        # TODO: Challenge 4 - Convert PokeAPI's dictionary into our Pokemon class.
         # Hint: use self._stats_by_name(data) before reading hp, attack,
         # defense, and speed.
         # Hint: Pokemon(...) expects id, name, type, sprite, hp, attack,
         # defense, speed, and moves.
-        raise NotImplementedError("Complete PokeAPI Challenge 2.")
+        raise NotImplementedError("Complete Challenge 4 in build_pokemon().")
 
-    def build_moves(self, pokemon_id: str) -> list[Move]:
-        # TODO: Return the four Move objects for this pokemon.
+    def build_moves(self, pokemon_id):
+        # TODO: Challenge 3 - Return the four Move objects for this pokemon.
         # Hint: STARTER_MOVE_IDS gives you ids. MOVE_LIBRARY gives you objects.
-        # Hint: this is the list comprehension challenge.
-        raise NotImplementedError("Complete PokeAPI Challenge 3.")
+        # Hint: loop through the ids and add each Move object to a list.
+        raise NotImplementedError("Complete Challenge 3 in build_moves().")
 
-    def _get_json(self, path: str) -> dict:
-        # Boilerplate: students call this helper, but do not need to write it.
-        response = requests.get(f"{self.base_url}{path}", timeout=10)
-        response.raise_for_status()
-        return response.json()
-
-    def _stats_by_name(self, data: dict) -> dict[str, int]:
-        return {stat["stat"]["name"]: stat["base_stat"] for stat in data["stats"]}
+    def _stats_by_name(self, data):
+        # TODO: Challenge 2 - Convert PokeAPI's stats list into a simple dictionary.
+        # Hint: each item in data["stats"] has a stat name and a base_stat.
+        # Hint: start with an empty dictionary, loop through data["stats"],
+        # and store each stat value by name.
+        raise NotImplementedError("Complete Challenge 2 in _stats_by_name().")
 
 
 pokeapi_client = PokeApiClient()
 
 
-async def fetch_roster() -> list[Pokemon]:
+async def fetch_roster():
     try:
         return pokeapi_client.fetch_roster()
     except Exception:
@@ -136,6 +154,10 @@ async def fetch_roster() -> list[Pokemon]:
         return STARTER_ROSTER
 
 
-async def get_pokemon_by_id(pokemon_id: str) -> Pokemon | None:
+async def get_pokemon_by_id(pokemon_id):
     roster = await fetch_roster()
-    return next((pokemon for pokemon in roster if pokemon.id == pokemon_id), None)
+    for pokemon in roster:
+        if pokemon.id == pokemon_id:
+            return pokemon
+
+    return None

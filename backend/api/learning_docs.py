@@ -6,7 +6,7 @@ def pokeapi_docs_payload() -> dict:
         "title": "Project E PokeAPI Student Docs",
         "purpose": (
             "Use this page before coding. It shows the real API path, the fields "
-            "the game needs, the helper students should call, and the backend "
+            "the game needs, the request students will make, and the backend "
             "response shapes the frontend expects."
         ),
         "whereToOpenThisPage": {
@@ -14,7 +14,7 @@ def pokeapi_docs_payload() -> dict:
             "ifFastApiRunsOn5173": "http://localhost:5173/api/pokeapi-docs",
             "importantNote": (
                 "In the provided setup, port 5173 is the frontend static server. "
-                "The backend API runs on port 8000 unless the teacher changes the "
+                "The backend API runs on port 8000 unless the uvicorn command changes the "
                 "uvicorn command."
             ),
         },
@@ -71,25 +71,22 @@ def pokeapi_docs_payload() -> dict:
                 "jsonPath": "stats",
                 "helper": "self._stats_by_name(data)",
                 "neededKeys": ["hp", "attack", "defense", "speed"],
-                "notes": "The helper turns PokeAPI's stats list into an easier dictionary.",
+                "notes": "Students build this helper. It turns PokeAPI's stats list into an easier dictionary.",
             },
             "moves": {
                 "source": "STARTER_MOVE_IDS and MOVE_LIBRARY",
                 "notes": "Students do not need to parse PokeAPI move data in this lesson.",
             },
         },
-        "providedBoilerplateStudentsShouldUse": {
+        "httpRequestStudentsWillBuild": {
             "file": "backend/engine/pokeapi_client.py",
-            "helper": "self._get_json(path)",
-            "whatItDoes": [
-                "adds the base PokeAPI URL",
-                "makes the HTTP request",
-                "checks for HTTP errors",
-                "converts the response into a Python dictionary",
-            ],
-            "studentResponsibility": [
-                "choose the correct path, such as /pokemon/pikachu",
-                "pass the returned dictionary to the next method",
+            "method": "PokeApiClient.fetch_pokemon(pokemon_id)",
+            "steps": [
+                "build the full URL with self.base_url + '/pokemon/' + pokemon_id",
+                "call requests.get(url, timeout=10)",
+                "call response.raise_for_status()",
+                "call response.json()",
+                "pass the data dictionary to self.build_pokemon(data)",
             ],
         },
         "constantsStudentsCanUse": {
@@ -100,27 +97,29 @@ def pokeapi_docs_payload() -> dict:
         "challengeMap": [
             {
                 "challenge": 1,
-                "title": "Fetch One Pokemon",
+                "title": "Make the PokeAPI Request",
                 "file": "backend/engine/pokeapi_client.py",
                 "method": "PokeApiClient.fetch_pokemon()",
                 "studentsDo": [
-                    "build the /pokemon/{pokemon_id} path",
-                    "call self._get_json(path)",
-                    "return self.build_pokemon(data)",
+                    "build the full PokeAPI URL",
+                    "call requests.get(url, timeout=10)",
+                    "turn the response into JSON",
+                    "send the data to self.build_pokemon(data)",
                 ],
-                "doneWhen": "client.fetch_pokemon('pikachu') returns a Pokemon object.",
+                "doneWhen": "client.fetch_pokemon('pikachu') makes a real request and returns a Pokemon after the builder is complete.",
             },
             {
                 "challenge": 2,
-                "title": "Build One Pokemon Object",
+                "title": "Build Stats By Name",
                 "file": "backend/engine/pokeapi_client.py",
-                "method": "PokeApiClient.build_pokemon()",
+                "method": "PokeApiClient._stats_by_name()",
                 "studentsDo": [
-                    "read name, type, sprite, and stats from the PokeAPI dictionary",
-                    "call self.build_moves(pokemon_id)",
-                    "return Pokemon(...)",
+                    "start with an empty dictionary",
+                    "loop through data['stats']",
+                    "read each stat name",
+                    "store each base_stat by name",
                 ],
-                "doneWhen": "The returned object has id, name, type, sprite, hp, attack, defense, speed, and moves.",
+                "doneWhen": "stats['hp'] and stats['attack'] are easy to read.",
             },
             {
                 "challenge": 3,
@@ -130,24 +129,37 @@ def pokeapi_docs_payload() -> dict:
                 "studentsDo": [
                     "look up move ids in STARTER_MOVE_IDS",
                     "use MOVE_LIBRARY to get Move objects",
-                    "use a list comprehension",
+                    "append each Move object to a list",
                 ],
                 "doneWhen": "client.build_moves('pikachu') returns four Move objects.",
             },
             {
                 "challenge": 4,
+                "title": "Build One Pokemon Object",
+                "file": "backend/engine/pokeapi_client.py",
+                "method": "PokeApiClient.build_pokemon()",
+                "studentsDo": [
+                    "read name, type, sprite, and stats from the PokeAPI dictionary",
+                    "call self._stats_by_name(data)",
+                    "call self.build_moves(pokemon_id)",
+                    "return Pokemon(...)",
+                ],
+                "doneWhen": "The returned object has id, name, type, sprite, hp, attack, defense, speed, and moves.",
+            },
+            {
+                "challenge": 5,
                 "title": "Build The Roster",
                 "file": "backend/engine/pokeapi_client.py",
                 "method": "PokeApiClient.fetch_roster()",
                 "studentsDo": [
                     "loop through ROSTER_IDS",
                     "call self.fetch_pokemon(...) for each id",
-                    "use a list comprehension",
+                    "append each Pokemon object to a list",
                 ],
                 "doneWhen": "GET /api/pokemon returns the four starter Pokemon.",
             },
             {
-                "challenge": 5,
+                "challenge": 6,
                 "title": "Create Battle Pokemon",
                 "file": "backend/engine/battle.py",
                 "method": "BattlePokemon.from_pokemon()",
@@ -159,7 +171,7 @@ def pokeapi_docs_payload() -> dict:
                 "doneWhen": "A Pokemon can enter battle at full HP.",
             },
             {
-                "challenge": 6,
+                "challenge": 7,
                 "title": "Create Battle State",
                 "file": "backend/engine/battle.py",
                 "method": "Battle.create()",
@@ -172,7 +184,7 @@ def pokeapi_docs_payload() -> dict:
                 "doneWhen": "POST /api/battles returns a battle state instead of an error.",
             },
             {
-                "challenge": 7,
+                "challenge": 8,
                 "title": "Return Battle State",
                 "file": "backend/engine/battle.py",
                 "method": "Battle.to_dict()",
@@ -183,22 +195,21 @@ def pokeapi_docs_payload() -> dict:
                 "doneWhen": "The frontend can load the battle screen.",
             },
             {
-                "challenge": 8,
-                "title": "Process One Move",
+                "challenge": "9A",
+                "title": "Validate And Select Move",
                 "file": "backend/engine/battle.py",
                 "method": "Battle.apply_move()",
                 "studentsDo": [
-                    "check whose turn it is",
+                    "reject finished battles",
+                    "reject moves from the wrong actor",
+                    "choose attacker and defender",
                     "find the selected move",
-                    "calculate damage",
-                    "lower HP without going below 0",
-                    "switch turns if nobody won",
                 ],
-                "doneWhen": "POST /api/battles/{battleId}/moves updates HP and turn.",
+                "doneWhen": "A valid move request has attacker, defender, and move.",
             },
             {
-                "challenge": 9,
-                "title": "Build Damage",
+                "challenge": 10,
+                "title": "Calculate Damage",
                 "file": "backend/engine/battle.py",
                 "function": "calculate_damage()",
                 "studentsDo": [
@@ -210,7 +221,20 @@ def pokeapi_docs_payload() -> dict:
                 "doneWhen": "Every valid move causes at least 1 damage.",
             },
             {
-                "challenge": 10,
+                "challenge": "9B",
+                "title": "Apply Move And Switch Turns",
+                "file": "backend/engine/battle.py",
+                "method": "Battle.apply_move()",
+                "studentsDo": [
+                    "call calculate_damage",
+                    "lower HP without going below 0",
+                    "add a battle log message",
+                    "switch turns if nobody won",
+                ],
+                "doneWhen": "POST /api/battles/{battleId}/moves updates HP and turn.",
+            },
+            {
+                "challenge": 11,
                 "title": "Detect The Winner",
                 "file": "backend/engine/battle.py",
                 "method": "Battle.apply_move()",
