@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from fastapi import APIRouter, HTTPException, WebSocket, WebSocketDisconnect
 
 from api.schemas import (
@@ -68,7 +66,7 @@ async def send_move(battle_id: str, payload: MoveRequest):
     return state
 
 
-async def process_socket_move(battle_id: str, message: dict, websocket: WebSocket) -> None:
+async def process_socket_move(battle_id, message, websocket):
     battle = battle_store.get(battle_id)
     if battle is None:
         await websocket.send_json({"error": "Battle not found."})
@@ -109,7 +107,7 @@ async def battle_socket_with_subscription(websocket: WebSocket):
     # subscribe. Keeping this beside /ws/{battle_id} gives students both common
     # WebSocket patterns to inspect.
     await websocket.accept()
-    battle_id: str | None = None
+    battle_id = None
 
     try:
         first_message = await websocket.receive_json()

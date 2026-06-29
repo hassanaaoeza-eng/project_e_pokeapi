@@ -109,6 +109,42 @@
                 </div>
             </div>
         </header>
+        <section
+            class="mb-8 bg-gba-cream dark:bg-gray-800 border-4 border-black dark:border-gray-400 p-4 shadow-retro max-w-5xl mx-auto">
+            <div class="flex flex-col lg:flex-row gap-4 lg:items-center lg:justify-between">
+                <div>
+                    <h2 class="font-pixel text-sm text-gray-900 dark:text-primary uppercase mb-2">Battle Mode</h2>
+                    <p class="font-display text-2xl text-gray-800 dark:text-gray-200" data-role="mode-message">
+                        Solo battle: you control your fighter and the enemy auto-moves.
+                    </p>
+                </div>
+                <div class="flex flex-col sm:flex-row gap-3">
+                    <button
+                        class="bg-hp-green text-gray-900 font-pixel text-xs px-4 py-3 border-4 border-black shadow-retro"
+                        data-role="mode-solo" type="button">
+                        Solo
+                    </button>
+                    <button
+                        class="bg-primary text-gray-900 font-pixel text-xs px-4 py-3 border-4 border-black shadow-retro opacity-80"
+                        data-role="mode-multiplayer" type="button">
+                        Host Multiplayer
+                    </button>
+                </div>
+            </div>
+            <div class="mt-4 grid grid-cols-1 md:grid-cols-[1fr_auto] gap-3">
+                <input
+                    class="h-12 px-3 bg-white dark:bg-gray-700 border-4 border-black text-2xl font-display focus:ring-0 focus:outline-none rounded-none shadow-retro"
+                    data-role="join-link-input"
+                    placeholder="Paste Player 2 join link here..."
+                    type="text" />
+                <button
+                    class="bg-gray-900 text-white font-pixel text-xs px-4 py-3 border-4 border-black shadow-retro"
+                    data-role="join-link-action"
+                    type="button">
+                    Join Battle
+                </button>
+            </div>
+        </section>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8" id="character-grid">
             <div class="group relative bg-white dark:bg-gray-700 border-4 border-black dark:border-gray-400 rounded-none p-2 shadow-retro hover:translate-y-1 hover:shadow-retro-hover transition-all duration-100 cursor-pointer overflow-hidden character-card"
                 data-role="fighter-card" data-name="charmeleon">

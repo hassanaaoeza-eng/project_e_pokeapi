@@ -109,38 +109,61 @@ class PokeApiClient:
         self.base_url = base_url.rstrip("/")
 
     def fetch_roster(self):
-        # TODO: Challenge 5 - Build the full roster from ROSTER_IDS.
-        # Hint: loop through ROSTER_IDS and call self.fetch_pokemon(...) for each id.
-        raise NotImplementedError("Complete Challenge 5 in fetch_roster().")
+        roster = []
+
+        for pokemon_id in ROSTER_IDS:
+            pokemon = self.fetch_pokemon(pokemon_id)
+            roster.append(pokemon)
+
+        return roster
 
     def fetch_pokemon(self, pokemon_id):
-        # TODO: Challenge 1 - Call the PokeAPI pokemon endpoint for one pokemon.
-        # Hint: build the full URL using self.base_url, /pokemon/, and pokemon_id.
-        # Hint: use requests.get(url, timeout=10).
-        # Hint: call response.raise_for_status(), then response.json().
-        # Hint: pass the response dictionary into self.build_pokemon(...).
-        raise NotImplementedError("Complete Challenge 1 in fetch_pokemon().")
+        url = self.base_url + "/pokemon/" + pokemon_id
+        response = requests.get(url, timeout=10)
+        response.raise_for_status()
+        data = response.json()
+
+        return self.build_pokemon(data)
 
     def build_pokemon(self, data):
-        # TODO: Challenge 4 - Convert PokeAPI's dictionary into our Pokemon class.
-        # Hint: use self._stats_by_name(data) before reading hp, attack,
-        # defense, and speed.
-        # Hint: Pokemon(...) expects id, name, type, sprite, hp, attack,
-        # defense, speed, and moves.
-        raise NotImplementedError("Complete Challenge 4 in build_pokemon().")
+        stats = self._stats_by_name(data)
+        pokemon_id = data["name"]
+        display_name = pokemon_id.title()
+        pokemon_type = data["types"][0]["type"]["name"]
+        sprite = data["sprites"]["front_default"]
+        moves = self.build_moves(pokemon_id)
+
+        return Pokemon(
+            id=pokemon_id,
+            name=display_name,
+            type=pokemon_type,
+            sprite=sprite,
+            hp=stats["hp"],
+            attack=stats["attack"],
+            defense=stats["defense"],
+            speed=stats["speed"],
+            moves=moves,
+        )
 
     def build_moves(self, pokemon_id):
-        # TODO: Challenge 3 - Return the four Move objects for this pokemon.
-        # Hint: STARTER_MOVE_IDS gives you ids. MOVE_LIBRARY gives you objects.
-        # Hint: loop through the ids and add each Move object to a list.
-        raise NotImplementedError("Complete Challenge 3 in build_moves().")
+        move_ids = STARTER_MOVE_IDS[pokemon_id]
+        moves = []
+
+        for move_id in move_ids:
+            move = MOVE_LIBRARY[move_id]
+            moves.append(move)
+
+        return moves
 
     def _stats_by_name(self, data):
-        # TODO: Challenge 2 - Convert PokeAPI's stats list into a simple dictionary.
-        # Hint: each item in data["stats"] has a stat name and a base_stat.
-        # Hint: start with an empty dictionary, loop through data["stats"],
-        # and store each stat value by name.
-        raise NotImplementedError("Complete Challenge 2 in _stats_by_name().")
+        stats = {}
+
+        for stat in data["stats"]:
+            name = stat["stat"]["name"]
+            value = stat["base_stat"]
+            stats[name] = value
+
+        return stats
 
 
 pokeapi_client = PokeApiClient()

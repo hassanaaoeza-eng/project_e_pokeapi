@@ -1,8 +1,9 @@
 // Provided frontend adapter.
 // Students write Python backend logic; this file only calls that backend.
 
-const API_BASE = 'http://localhost:8000';
-const WS_BASE = 'ws://localhost:8000';
+const BACKEND_HOST = window.location.hostname || 'localhost';
+const API_BASE = `http://${BACKEND_HOST}:8000`;
+const WS_BASE = `ws://${BACKEND_HOST}:8000`;
 
 async function request(path, options = {}) {
     const response = await fetch(`${API_BASE}${path}`, {
@@ -45,6 +46,10 @@ export async function createBattle(playerPokemon, enemyPokemon) {
             enemyPokemonId: enemyPokemon.id,
         }),
     });
+}
+
+export async function getBattle(battleId) {
+    return request(`/api/battles/${battleId}`);
 }
 
 export async function sendMove(battleId, actor, moveId) {

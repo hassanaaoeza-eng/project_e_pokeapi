@@ -25,16 +25,16 @@ export function initOverlay() {
     }
 }
 
-export function determineBattleOutcome(battleState) {
+export function determineBattleOutcome(battleState, viewerRole = 'player') {
     if (!battleState?.winner) return null;
 
-    const playerWon = battleState.winner === 'player';
-    const featuredPokemon = playerWon ? battleState.player : battleState.enemy;
+    const viewerWon = battleState.winner === viewerRole;
+    const featuredPokemon = battleState.winner === 'player' ? battleState.player : battleState.enemy;
 
     return {
-        result: playerWon ? 'victory' : 'defeat',
+        result: viewerWon ? 'victory' : 'defeat',
         winner: battleState.winner,
-        loser: playerWon ? 'enemy' : 'player',
+        loser: battleState.winner === 'player' ? 'enemy' : 'player',
         featuredPokemon,
     };
 }

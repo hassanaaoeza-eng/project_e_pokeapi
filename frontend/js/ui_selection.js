@@ -3,6 +3,7 @@ import { getPokemon } from './api.js';
 let roster = [];
 let selectedPlayer = null;
 let selectedEnemy = null;
+let battleMode = 'solo';
 
 export async function initSelection() {
     const cards = Array.from(document.querySelectorAll('[data-role="fighter-card"]'));
@@ -10,8 +11,14 @@ export async function initSelection() {
     const searchPlayerInput = document.getElementById('search-fighter');
     const searchEnemyInput = document.getElementById('search-enemy');
     const systemMsg = document.getElementById('system-message');
+    const modeMessage = document.querySelector('[data-role="mode-message"]');
+    const soloModeBtn = document.querySelector('[data-role="mode-solo"]');
+    const multiplayerModeBtn = document.querySelector('[data-role="mode-multiplayer"]');
+    const joinLinkInput = document.querySelector('[data-role="join-link-input"]');
+    const joinLinkAction = document.querySelector('[data-role="join-link-action"]');
 
     clearOldGameState();
+    setBattleMode('solo', { modeMessage, soloModeBtn, multiplayerModeBtn });
     writeSystemMessage(systemMsg, 'Loading roster from the Python backend...');
 
     try {
@@ -25,6 +32,7 @@ export async function initSelection() {
     }
 
     configureControls({ confirmBtn, searchEnemyInput });
+    configureModeControls({ modeMessage, soloModeBtn, multiplayerModeBtn, joinLinkInput, joinLinkAction, systemMsg });
 
     if (searchPlayerInput) {
         searchPlayerInput.addEventListener('input', () => {
@@ -44,9 +52,74 @@ export async function initSelection() {
 
             localStorage.setItem('selectedPlayer', JSON.stringify(selectedPlayer));
             localStorage.setItem('selectedEnemy', JSON.stringify(selectedEnemy));
+            localStorage.setItem('battleMode', battleMode);
             window.location.href = 'battle.html';
         });
     }
+}
+
+function configureModeControls({ modeMessage, soloModeBtn, multiplayerModeBtn, joinLinkInput, joinLinkAction, systemMsg }) {
+    if (soloModeBtn) {
+        soloModeBtn.addEventListener('click', () => {
+            setBattleMode('solo', { modeMessage, soloModeBtn, multiplayerModeBtn });
+            writeSystemMessage(systemMsg, 'Solo mode selected. Choose your fighter, then choose an opponent.');
+        });
+    }
+
+    if (multiplayerModeBtn) {
+        multiplayerModeBtn.addEventListener('click', () => {
+            setBattleMode('multiplayer', { modeMessage, soloModeBtn, multiplayerModeBtn });
+            writeSystemMessage(systemMsg, 'Host multiplayer selected. Choose both fighters, then send Player 2 the join link.');
+        });
+    }
+
+    if (joinLinkAction) {
+        joinLinkAction.addEventListener('click', () => {
+            const value = joinLinkInput?.value?.trim();
+            if (!value) {
+                writeSystemMessage(systemMsg, 'Paste a Player 2 join link first.');
+                return;
+            }
+
+            openJoinLink(value);
+        });
+    }
+}
+
+function setBattleMode(mode, { modeMessage, soloModeBtn, multiplayerModeBtn }) {
+    battleMode = mode;
+
+    if (modeMessage) {
+        if (mode === 'multiplayer') {
+            modeMessage.textContent = 'Host multiplayer: you create the battle, then send Player 2 the join link.';
+        } else {
+            modeMessage.textContent = 'Solo battle: you control your fighter and the enemy auto-moves.';
+        }
+    }
+
+    if (soloModeBtn) {
+        soloModeBtn.classList.toggle('opacity-80', mode !== 'solo');
+        soloModeBtn.classList.toggle('ring-4', mode === 'solo');
+        soloModeBtn.classList.toggle('ring-white', mode === 'solo');
+    }
+
+    if (multiplayerModeBtn) {
+        multiplayerModeBtn.classList.toggle('opacity-80', mode !== 'multiplayer');
+        multiplayerModeBtn.classList.toggle('ring-4', mode === 'multiplayer');
+        multiplayerModeBtn.classList.toggle('ring-white', mode === 'multiplayer');
+    }
+}
+
+function openJoinLink(value) {
+    if (value.startsWith('http://') || value.startsWith('https://')) {
+        window.location.href = value;
+        return;
+    }
+
+    const url = new URL('battle.html', window.location.href);
+    url.searchParams.set('battleId', value);
+    url.searchParams.set('role', 'enemy');
+    window.location.href = url.toString();
 }
 
 function renderCards(cards, pokemonList, systemMsg) {
@@ -181,6 +254,7 @@ function clearOldGameState() {
     localStorage.removeItem('selectedEnemy');
     localStorage.removeItem('battleState');
     localStorage.removeItem('overlayState');
+    localStorage.removeItem('battleMode');
 }
 
 function configureControls({ confirmBtn, searchEnemyInput }) {

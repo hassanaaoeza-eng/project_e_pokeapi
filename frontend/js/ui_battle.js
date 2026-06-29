@@ -1,4 +1,4 @@
-import { connectBattleSocket, createBattle, sendMove } from './api.js';
+import { connectBattleSocket, createBattle, getBattle, sendMove } from './api.js';
 import { applyCriticalEffects } from './ui_critical_health_state.js';
 import { determineBattleOutcome, routeToOverlay, saveOverlayState } from './ui_overlay.js';
 
@@ -8,9 +8,21 @@ const ENEMY_PLACEHOLDER = 'assets/placeholders/enemy-placeholder.svg';
 let battleState = null;
 let cleanupSocket = null;
 let enemyTurnTimer = null;
+let myRole = 'player';
+let battleMode = 'solo';
 
 export async function initBattle() {
     renderLoadingShell();
+
+    const params = new URLSearchParams(window.location.search);
+    const battleIdFromUrl = params.get('battleId');
+    myRole = params.get('role') === 'enemy' ? 'enemy' : 'player';
+    battleMode = battleIdFromUrl ? 'multiplayer' : (localStorage.getItem('battleMode') || 'solo');
+
+    if (battleIdFromUrl) {
+        await joinExistingBattle(battleIdFromUrl);
+        return;
+    }
 
     const selectedPlayer = readJson('selectedPlayer');
     const selectedEnemy = readJson('selectedEnemy');
@@ -25,12 +37,30 @@ export async function initBattle() {
 
     try {
         battleState = await createBattle(selectedPlayer, selectedEnemy);
+        myRole = 'player';
+        localStorage.setItem('battleState', JSON.stringify(battleState));
+        if (battleMode === 'multiplayer') {
+            saveBattleUrl(battleState.battleId, myRole);
+        }
+        renderBattleState(battleState);
+        cleanupSocket = connectBattleSocket(battleState.battleId, renderBattleState);
+        if (battleMode === 'multiplayer') {
+            showPartnerJoinLink(battleState.battleId);
+        }
+    } catch (error) {
+        appendBattleLog(['Backend unavailable. Start FastAPI on port 8000.']);
+        console.error(error);
+    }
+}
+
+async function joinExistingBattle(battleId) {
+    try {
+        battleState = await getBattle(battleId);
         localStorage.setItem('battleState', JSON.stringify(battleState));
         renderBattleState(battleState);
         cleanupSocket = connectBattleSocket(battleState.battleId, renderBattleState);
-        maybeRunEnemyTurn();
     } catch (error) {
-        appendBattleLog(['Backend unavailable. Start FastAPI on port 8000.']);
+        appendBattleLog(['Battle not found. Check the battle link and make sure the host backend is still running.']);
         console.error(error);
     }
 }
@@ -68,11 +98,13 @@ export function renderBattleState(nextState) {
         hpPercent(battleState.enemy),
         `${battleState.enemy.currentHp} / ${battleState.enemy.maxHp}`,
     );
-    renderMoves(battleState.player.moves || []);
+    const myPokemon = battleState[myRole];
+    renderMoves(myPokemon?.moves || []);
     appendBattleLog(battleState.log || []);
-    setPlayerControlsEnabled(battleState.turn === 'player' && !battleState.winner);
+    appendRoleMessage();
+    setPlayerControlsEnabled(battleState.turn === myRole && !battleState.winner);
 
-    const outcome = determineBattleOutcome(battleState);
+    const outcome = determineBattleOutcome(battleState, myRole);
     if (outcome) {
         saveOverlayState(outcome);
         cleanupSocket?.();
@@ -80,7 +112,11 @@ export function renderBattleState(nextState) {
         return;
     }
 
-    maybeRunEnemyTurn();
+    if (battleMode === 'solo') {
+        maybeRunEnemyTurn();
+    } else {
+        clearTimeout(enemyTurnTimer);
+    }
 }
 
 function renderMoves(moves) {
@@ -94,9 +130,9 @@ function renderMoves(moves) {
         setTextIn(button, '[data-role="move-pp"]', move ? `${move.pp} PP` : '-');
         button.disabled = !move;
         button.onclick = async () => {
-            if (!battleState || battleState.turn !== 'player' || battleState.winner || !move) return;
+            if (!battleState || battleState.turn !== myRole || battleState.winner || !move) return;
             setPlayerControlsEnabled(false);
-            const updatedState = await sendMove(battleState.battleId, 'player', move.id);
+            const updatedState = await sendMove(battleState.battleId, myRole, move.id);
             renderBattleState(updatedState);
         };
     });
@@ -135,6 +171,55 @@ function appendBattleLog(entries) {
         line.textContent = entry;
         logEl.appendChild(line);
     });
+}
+
+function appendRoleMessage() {
+    const logEl = document.querySelector('[data-role="battle-log"]');
+    if (!logEl || !battleState) return;
+
+    const line = document.createElement('p');
+    line.className = 'text-yellow-300 leading-tight';
+
+    if (battleState.winner) {
+        line.textContent = battleState.winner === myRole ? 'You won this battle.' : 'You lost this battle.';
+    } else if (battleState.turn === myRole) {
+        line.textContent = 'Your turn. Choose a move.';
+    } else {
+        line.textContent = 'Opponent turn. Wait for their move.';
+    }
+
+    logEl.appendChild(line);
+
+    if (battleMode === 'multiplayer' && myRole === 'player' && !battleState.winner) {
+        const partnerUrl = new URL(window.location.href);
+        partnerUrl.searchParams.set('battleId', battleState.battleId);
+        partnerUrl.searchParams.set('role', 'enemy');
+
+        const linkLine = document.createElement('p');
+        linkLine.className = 'text-green-300 leading-tight break-all';
+        linkLine.textContent = 'Player 2 join link: ' + partnerUrl.toString();
+        logEl.appendChild(linkLine);
+    }
+}
+
+function saveBattleUrl(battleId, role) {
+    const url = new URL(window.location.href);
+    url.searchParams.set('battleId', battleId);
+    url.searchParams.set('role', role);
+    window.history.replaceState({}, '', url.toString());
+}
+
+function showPartnerJoinLink(battleId) {
+    const partnerUrl = new URL(window.location.href);
+    partnerUrl.searchParams.set('battleId', battleId);
+    partnerUrl.searchParams.set('role', 'enemy');
+
+    appendBattleLog([
+        'Battle created.',
+        'Send this link to Player 2:',
+        'Join code: ' + battleId,
+        partnerUrl.toString(),
+    ]);
 }
 
 function setHpBar(role, percent, label) {
